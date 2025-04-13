@@ -7,6 +7,7 @@ try:
 except ImportError:
     javalang = None
 
+
 class JavaChunker(BaseChunker):
     MAX_CHUNK_LINES = 80
 
@@ -29,47 +30,39 @@ class JavaChunker(BaseChunker):
         for type_node in tree.types:
             if hasattr(type_node, "name") and type_node.position:
                 start = type_node.position.line
-                end = start + len(str(type_node).splitlines())
+                end = self._find_scope_end(start, lines)
                 if end - start + 1 > self.MAX_CHUNK_LINES:
-                    chunks.extend(self._split_long_chunk(
-                        lines[start - 1:end],
-                        "class",
-                        type_node.name,
-                        start,
-                        file_path
-                    ))
+                    chunks.extend(
+                        self._split_long_chunk(lines[start - 1:end], "class", type_node.name, start, file_path))
                 else:
-                    chunks.append(CodeChunk(
-                        chunk_type="class",
-                        name=type_node.name,
-                        start_line=start,
-                        end_line=end,
-                        source="\\n".join(lines[start - 1:end]),
-                        file_path=str(file_path),
-                    ))
+                    chunks.append(CodeChunk("class", type_node.name, start, end, "\\n".join(lines[start - 1:end]),
+                                            str(file_path)))
 
             for member in getattr(type_node, "body", []):
                 if isinstance(member, javalang.tree.MethodDeclaration) and member.position:
                     start = member.position.line
-                    end = start + len(str(member).splitlines())
+                    end = self._find_scope_end(start, lines)
                     if end - start + 1 > self.MAX_CHUNK_LINES:
-                        chunks.extend(self._split_long_chunk(
-                            lines[start - 1:end],
-                            "method",
-                            member.name,
-                            start,
-                            file_path
-                        ))
+                        chunks.extend(
+                            self._split_long_chunk(lines[start - 1:end], "method", member.name, start, file_path))
                     else:
-                        chunks.append(CodeChunk(
-                            chunk_type="method",
-                            name=member.name,
-                            start_line=start,
-                            end_line=end,
-                            source="\\n".join(lines[start - 1:end]),
-                            file_path=str(file_path),
-                        ))
+                        chunks.append(CodeChunk("method", member.name, start, end, "\\n".join(lines[start - 1:end]),
+                                                str(file_path)))
+
         return chunks
+
+    def _find_scope_end(self, start_line: int, lines: List[str]) -> int:
+        brace_level = 0
+        in_scope = False
+        for i in range(start_line - 1, len(lines)):
+            line = lines[i]
+            brace_level += line.count("{")
+            brace_level -= line.count("}")
+            if "{" in line:
+                in_scope = True
+            if in_scope and brace_level == 0:
+                return i + 1
+        return len(lines)
 
     def _split_long_chunk(self, raw_lines, chunk_type, name, start_line, file_path: Path) -> List[CodeChunk]:
         chunks = []
@@ -79,9 +72,9 @@ class JavaChunker(BaseChunker):
         for i, line in enumerate(raw_lines):
             buffer.append(line)
             is_split_point = (
-                len(buffer) >= self.MAX_CHUNK_LINES or
-                line.strip() == "" or
-                line.strip().startswith("//")
+                    len(buffer) >= self.MAX_CHUNK_LINES or
+                    line.strip() == "" or
+                    line.strip().startswith("//")
             )
             if is_split_point:
                 sub_end_line = sub_start_line + len(buffer) - 1
