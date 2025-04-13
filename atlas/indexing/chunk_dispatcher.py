@@ -1,8 +1,15 @@
 from pathlib import Path
 from .python_chunker import PythonChunker
+from .java_chunker import JavaChunker
+from .sql_chunker import SQLChunker
 
 
 def get_chunker(file_path: Path):
-    if file_path.suffix == ".py":
+    suffix = file_path.suffix.lower()
+    if suffix == ".py":
         return PythonChunker()
-    raise ValueError(f"No chunker implemented for file type: {file_path.suffix}")
+    elif suffix == ".java":
+        return JavaChunker()
+    elif suffix in [".sql", ".psql"]:
+        return SQLChunker()
+    raise ValueError(f"No chunker implemented for file type: {suffix}")
