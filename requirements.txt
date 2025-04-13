@@ -1,0 +1,5 @@
+openai
+qdrant-client
+tiktoken
+python-dotenv
+typer

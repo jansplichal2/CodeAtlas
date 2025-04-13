@@ -1,109 +1,107 @@
-# 🧭 Roadmap: Semantic Codebase Understanding System
+# 🗺️ CodeAtlas++ MVP Roadmap
 
-This roadmap outlines the key milestones for building a system that semantically understands a mixed legacy codebase using chunking, embeddings, relational metadata, and LLM-powered reasoning.
-
----
-
-## ✅ Milestone 1: Chunking Source Files
-
-**Goal:** Convert raw code into coherent, semantically meaningful chunks.
-
-### Tasks:
-- [ ] Detect file types: Java, SQL, JSP, XML
-- [ ] Use file-type specific chunking:
-  - Java: methods/classes via `tree-sitter` or `javalang`
-  - SQL: statements or `BEGIN...END` blocks via `sqlparse`
-  - JSP: scriptlets, `<c:*>`, `${}` expressions
-  - XML: nodes like `<bean>`, `<sql>`, `<config>`
-- [ ] Tag each chunk with:
-  - File path
-  - Language
-  - Start/end line numbers
-  - Chunk type (e.g. `method`, `sql_block`, `jsp_scriptlet`)
-
-**Output:** List of well-scoped chunks with metadata.
+> **Goal**: Build a developer-assist tool that enables reasoning over entire codebases using LLMs, vector search, and task memory. Target MVP in 8–10 weeks.
 
 ---
 
-## ✅ Milestone 2: Populate Relational DB (SQLite)
+## ✅ Phase 1: Core Foundation (Week 1–2)
 
-**Goal:** Make the codebase searchable, filterable, and analyzable via SQL.
+**Objectives:**
+- Parse codebase into meaningful chunks (function/class/module)
+- Generate embeddings
+- Store code metadata and semantic index
 
-### Tasks:
-- [ ] Design SQLite schema (`chunks`, `tables_used`, `columns_used`, etc.)
-- [ ] Insert all chunks with:
-  - Chunk ID
-  - Chunk text
-  - Metadata (file, function, type, etc.)
-- [ ] Optional enrichment:
-  - Table/column references (from SQL)
-  - Function names
-  - Comment headers (for future summaries)
-
-**Output:** A structured, SQL-queryable mirror of the codebase.
+**Tasks:**
+- [ ] CLI tool: `codeatlas init <path-to-repo>`
+- [ ] AST parser for supported languages (start with Python)
+- [ ] Embedding generator (OpenAI `text-embedding-3-small` or CodeBERT)
+- [ ] Vector DB setup (Chroma or Qdrant)
+- [ ] Store: file path, symbol, dependencies
 
 ---
 
-## ✅ Milestone 3: Embed & Store in Vector DB
+## 🧠 Phase 2: Query & Reasoning Agent (Week 3–5)
 
-**Goal:** Enable semantic retrieval using vector similarity search.
+**Objectives:**
+- Enable high-level developer queries over the codebase
+- Use LLM to generate diffs, explanations, and changelogs
 
-### Tasks:
-- [ ] Choose embedding model:
-  - `text-embedding-3-small` (cheaper)
-  - `text-embedding-3-large` (richer)
-  - Local fallback: `nomic-embed-text`, `bge-large`
-- [ ] Token-limit + batch chunks (max 8192 tokens per chunk)
-- [ ] Generate embeddings
-- [ ] Store embeddings in vector DB (e.g. Qdrant), along with:
-  - Chunk ID
-  - Shallow metadata (`file`, `method`, `table`)
-
-**Output:** Vectorized semantic index for similarity queries.
-
----
-
-## ✅ Milestone 4: Implement LLM-powered Agent
-
-**Goal:** Enable intelligent interaction with the codebase via natural language.
-
-### Tasks:
-- [ ] User inputs natural-language query
-- [ ] Embed query and search vector DB for relevant chunks
-- [ ] Use SQLite for refinement/filtering
-- [ ] Build prompt with context-rich retrieved chunks
-- [ ] Send to LLM and return response
-- [ ] (Optional) Enable follow-up questions or chain-of-thought reasoning
-
-### Example Prompts:
-- “What does `Buyer.statusCode` represent?”
-- “Where is `validateOrder` called with `null` arguments?”
-- “Summarize logic affecting `buyer` table rows.”
-
-**Output:** First functional version of your code-aware assistant.
+**Tasks:**
+- [ ] Define natural query format: `"Refactor this module for X"`
+- [ ] Retrieve relevant code chunks via vector search
+- [ ] Prompt LLM with goal + code context
+- [ ] Return:
+  - [ ] Natural language explanation
+  - [ ] Code patch (diff)
+  - [ ] Risk or review notes
+  - [ ] Draft changelog
 
 ---
 
-## 🧠 Optional Future Milestones
+## 🗃️ Phase 3: Task Memory & History (Week 6–7)
 
-- [ ] Enum value inference and annotation
-- [ ] Auto-generate documentation per column/function
-- [ ] Interactive UI or web frontend
-- [ ] Graph DB (e.g. Neo4j) for call graphs and flow analysis
-- [ ] CLI wrapper with prompt templates
-- [ ] Export annotated codebase to Markdown or Docusaurus
+**Objectives:**
+- Track agent output across multiple queries
+- Allow undo, reattempts, and contextual follow-ups
 
----
-
-## 🛠 Technologies Considered
-
-- **Chunking:** `tree-sitter`, `javalang`, `sqlparse`, regex fallback
-- **Relational DB:** SQLite or DuckDB
-- **Vector DB:** Qdrant (preferred), Chroma (dev), Weaviate (schema-rich)
-- **LLM:** OpenAI API or local instruct model
-- **Embedding Model:** OpenAI `text-embedding-3`, `nomic-embed-text`, `bge-large`
+**Tasks:**
+- [ ] Store per-task memory:
+  - [ ] Prompt
+  - [ ] Code changes
+  - [ ] Reasoning
+  - [ ] Approval state
+- [ ] SQLite or lightweight Postgres store
+- [ ] Command: `codeatlas history`, `codeatlas explain <change-id>`
 
 ---
 
-*Author: Jan Splichal  
-*Created: [2025-04-11]*  
+## 🔁 Phase 4: Git Integration & Dev Loop (Week 8–9)
+
+**Objectives:**
+- Help developer stage, commit, and review AI-generated changes
+
+**Tasks:**
+- [ ] Display diff + rationale
+- [ ] Command: `codeatlas review`
+- [ ] Command: `codeatlas commit`
+- [ ] Optional: `codeatlas pr` to open GitHub/GitLab PR
+
+---
+
+## 🎯 Future Enhancements (Post-MVP)
+
+- [ ] Add Claude/Gemini support for longer context window
+- [ ] Frontend UI (Streamlit/React)
+- [ ] Screenshot → layout parser (via GPT-4 Vision)
+- [ ] Agent planner for multi-step refactors
+- [ ] Add support for additional languages (TypeScript, SQL, etc.)
+
+---
+
+## 🧭 Suggested Tech Stack
+
+| Layer          | Tools / Libraries                     |
+|----------------|----------------------------------------|
+| LLM API        | OpenAI GPT-4, Claude 2.1              |
+| Embeddings     | OpenAI `text-embedding-3-small`       |
+| Vector DB      | Chroma, Weaviate, or Qdrant           |
+| Parser         | `ast`, `tree-sitter`, or `jedi`       |
+| Storage        | SQLite or Postgres                    |
+| CLI            | Click, Typer, or Argparse             |
+| Optional UI    | Streamlit or React (later phase)      |
+
+---
+
+## 🧩 MVP Deliverables
+
+- CLI tool to initialize and analyze codebase
+- Vector DB with semantically chunked code
+- Agent that can reason over goals and propose diffs
+- Review loop with memory and history
+- Git integration (diffs, commit, PR)
+
+---
+
+> Status: **In design**
+> Timeline: **~8–10 weeks**
+> Team: **Solo dev, expandable**
