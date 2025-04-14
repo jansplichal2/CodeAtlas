@@ -1,14 +1,11 @@
 # Stub for embedding logic
 
-import os
 import json
-from pathlib import Path
 from typing import List
 import tiktoken
 from atlas.indexing.base_chunker import CodeChunk
+from atlas.config import CHUNK_DIR, MAX_TOKENS
 
-CHUNK_DIR = Path(".chunks")
-MAX_TOKENS = 8192
 ENCODER = tiktoken.get_encoding("cl100k_base")
 
 
