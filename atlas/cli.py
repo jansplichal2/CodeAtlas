@@ -2,6 +2,7 @@ import typer
 from pathlib import Path
 from atlas.indexing.chunk_dispatcher import get_chunker
 from atlas.indexing.embedder import save_chunks_to_files, dry_run_validate_chunks
+from atlas.memory.loader import load_chunks_to_sqlite
 
 app = typer.Typer()
 
@@ -62,6 +63,15 @@ def embed(path: str, dry_run: bool = typer.Option(False, "--dry-run", help="Only
         dry_run_validate_chunks()
     else:
         typer.echo("🚧 Embedding not yet implemented.")
+
+
+@app.command("db-load")
+def db_load():
+    """
+    Load all valid chunks from .chunks/ into SQLite.
+    """
+    typer.echo("📥 Loading chunk metadata into SQLite...")
+    load_chunks_to_sqlite()
 
 
 if __name__ == "__main__":
