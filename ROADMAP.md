@@ -1,107 +1,68 @@
-# 🗺️ CodeAtlas++ MVP Roadmap
+# 📍 CodeAtlas++ Roadmap
 
-> **Goal**: Build a developer-assist tool that enables reasoning over entire codebases using LLMs, vector search, and task memory. Target MVP in 8–10 weeks.
-
----
-
-## ✅ Phase 1: Core Foundation (Week 1–2)
-
-**Objectives:**
-- Parse codebase into meaningful chunks (function/class/module)
-- Generate embeddings
-- Store code metadata and semantic index
-
-**Tasks:**
-- [ ] CLI tool: `codeatlas init <path-to-repo>`
-- [ ] AST parser for supported languages (start with Python)
-- [ ] Embedding generator (OpenAI `text-embedding-3-small` or CodeBERT)
-- [ ] Vector DB setup (Chroma or Qdrant)
-- [ ] Store: file path, symbol, dependencies
+A step-by-step plan to build an AI-powered semantic explorer for legacy codebases.
 
 ---
 
-## 🧠 Phase 2: Query & Reasoning Agent (Week 3–5)
+## ✅ Phase 1: Chunking System
 
-**Objectives:**
-- Enable high-level developer queries over the codebase
-- Use LLM to generate diffs, explanations, and changelogs
-
-**Tasks:**
-- [ ] Define natural query format: `"Refactor this module for X"`
-- [ ] Retrieve relevant code chunks via vector search
-- [ ] Prompt LLM with goal + code context
-- [ ] Return:
-  - [ ] Natural language explanation
-  - [ ] Code patch (diff)
-  - [ ] Risk or review notes
-  - [ ] Draft changelog
+- [x] Python chunker using `ast`
+- [x] Java chunker using `javalang`
+- [x] SQL chunker using regex splitting
+- [x] Heuristic subchunking for long methods and classes
+- [x] Language-aware dispatcher (`chunk_dispatcher.py`)
+- [x] Unit tests for all language chunkers
 
 ---
 
-## 🗃️ Phase 3: Task Memory & History (Week 6–7)
+## ✅ Phase 2: Chunk Storage and Validation
 
-**Objectives:**
-- Track agent output across multiple queries
-- Allow undo, reattempts, and contextual follow-ups
-
-**Tasks:**
-- [ ] Store per-task memory:
-  - [ ] Prompt
-  - [ ] Code changes
-  - [ ] Reasoning
-  - [ ] Approval state
-- [ ] SQLite or lightweight Postgres store
-- [ ] Command: `codeatlas history`, `codeatlas explain <change-id>`
+- [x] Serialize all chunks to individual `.chunks/*.json` files
+- [x] Implement `--dry-run` with `tiktoken` to check token limits
+- [x] CLI command: `codeatlas embed --dry-run`
 
 ---
 
-## 🔁 Phase 4: Git Integration & Dev Loop (Week 8–9)
+## ✅ Phase 3: Chunk Metadata in SQLite
 
-**Objectives:**
-- Help developer stage, commit, and review AI-generated changes
-
-**Tasks:**
-- [ ] Display diff + rationale
-- [ ] Command: `codeatlas review`
-- [ ] Command: `codeatlas commit`
-- [ ] Optional: `codeatlas pr` to open GitHub/GitLab PR
+- [x] Central config module (`config.py`) for paths and constants
+- [x] SQLite schema and storage module for `chunks` table
+- [x] CLI command: `codeatlas db-load` to insert metadata into SQLite
+- [x] Token counts and status tracking in DB
 
 ---
 
-## 🎯 Future Enhancements (Post-MVP)
+## 🚧 Phase 4: Embedding + Vector Indexing
 
-- [ ] Add Claude/Gemini support for longer context window
-- [ ] Frontend UI (Streamlit/React)
-- [ ] Screenshot → layout parser (via GPT-4 Vision)
-- [ ] Agent planner for multi-step refactors
-- [ ] Add support for additional languages (TypeScript, SQL, etc.)
-
----
-
-## 🧭 Suggested Tech Stack
-
-| Layer          | Tools / Libraries                     |
-|----------------|----------------------------------------|
-| LLM API        | OpenAI GPT-4, Claude 2.1              |
-| Embeddings     | OpenAI `text-embedding-3-small`       |
-| Vector DB      | Chroma, Weaviate, or Qdrant           |
-| Parser         | `ast`, `tree-sitter`, or `jedi`       |
-| Storage        | SQLite or Postgres                    |
-| CLI            | Click, Typer, or Argparse             |
-| Optional UI    | Streamlit or React (later phase)      |
+- [ ] Select `ready` chunks from SQLite
+- [ ] Generate embeddings using OpenAI API
+- [ ] Index vectors into Qdrant
+- [ ] Mark successfully indexed chunks as `embedded` in SQLite
+- [ ] Handle failed embeddings (retry, mark `failed`, preserve file)
 
 ---
 
-## 🧩 MVP Deliverables
+## ⏳ Phase 5: Query + Agent Framework (planned)
 
-- CLI tool to initialize and analyze codebase
-- Vector DB with semantically chunked code
-- Agent that can reason over goals and propose diffs
-- Review loop with memory and history
-- Git integration (diffs, commit, PR)
+- [ ] Semantic search over indexed chunks
+- [ ] Explain / summarize code using LLM
+- [ ] Suggest refactors across chunk boundaries
+- [ ] Multi-file context-aware querying
 
 ---
 
-> Status: **In design**
-> Timeline: **~8–10 weeks**
-> Team: **Solo dev, expandable**
+## ⏳ Phase 6: Language Extensions (planned)
+
+- [ ] Add support for TypeScript and C#
+- [ ] Optional LLM-driven chunking refinement
+- [ ] Custom adapters for framework-heavy codebases
+
+---
+
+## ⏳ Phase 7: Interface + UX (planned)
+
+- [ ] CLI interface for query + insight generation
+- [ ] Web UI / TUI for visual graph of code relationships
+- [ ] Export annotated code to Markdown or HTML
+
+  
