@@ -1,13 +1,9 @@
 import typer
 from pathlib import Path
 from atlas.indexing.chunk_dispatcher import get_chunker
+from atlas.indexing.embedder import save_chunks_to_files, dry_run_validate_chunks
 
 app = typer.Typer()
-
-
-@app.command()
-def main():
-    pass
 
 
 @app.command()
@@ -29,13 +25,43 @@ def init(path: str):
                 chunker = get_chunker(file_path)
                 chunks = chunker.extract_chunks_from_file(file_path)
                 for chunk in chunks:
-                    typer.echo(f"📄 [{chunk.chunk_type}] {chunk.name or '<doc>'} "
-                               f"({chunk.start_line}-{chunk.end_line})")
+                    typer.echo(f"📄 [{chunk.chunk_type}] {chunk.name or '<doc>'} ({chunk.start_line}-{chunk.end_line})")
                 total_chunks += len(chunks)
             except Exception as e:
                 typer.echo(f"⚠️ Skipped {file_path.name}: {e}")
 
     typer.echo(f"✅ Finished. Extracted {total_chunks} chunks.")
+
+
+@app.command()
+def embed(path: str, dry_run: bool = typer.Option(False, "--dry-run", help="Only check tokens, do not embed")):
+    """
+    Embed code chunks from the codebase and prepare them for vector indexing.
+    """
+    base_path = Path(path).resolve()
+    if not base_path.exists():
+        typer.echo(f"❌ Path does not exist: {base_path}")
+        raise typer.Exit(code=1)
+
+    typer.echo(f"🔍 Scanning and chunking for embedding: {base_path}")
+    all_chunks = []
+    for file_path in base_path.rglob("*"):
+        if file_path.is_file():
+            try:
+                chunker = get_chunker(file_path)
+                chunks = chunker.extract_chunks_from_file(file_path)
+                all_chunks.extend(chunks)
+            except Exception as e:
+                typer.echo(f"⚠️ Skipped {file_path.name}: {e}")
+
+    save_chunks_to_files(all_chunks)
+    typer.echo(f"💾 Saved {len(all_chunks)} chunks to .chunks/")
+
+    if dry_run:
+        typer.echo("🔍 Running dry run token check...")
+        dry_run_validate_chunks()
+    else:
+        typer.echo("🚧 Embedding not yet implemented.")
 
 
 if __name__ == "__main__":
