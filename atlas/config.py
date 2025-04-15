@@ -16,3 +16,6 @@ MAX_TOKENS = 8192
 EMBED_MODEL = "text-embedding-3-small"
 QDRANT_COLLECTION = "codeatlas_chunks"
 QDRANT_DIM = 1536  # For text-embedding-3-small
+
+QDRANT_HOST = "localhost"
+QDRANT_PORT = 6333

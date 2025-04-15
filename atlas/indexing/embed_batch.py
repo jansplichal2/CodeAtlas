@@ -58,7 +58,12 @@ def embed_ready_chunks(batch_size: int = 100):
     print(f"🔗 Embedded {len(embeddings)} chunks.")
 
     pairs = list(zip(ids, embeddings))
-    index_embeddings(pairs)
-    update_chunk_status(ids, "embedded")
-    cleanup_chunks(ids)
-    print(f"✅ Updated and cleaned up {len(ids)} chunks.")
+
+    try:
+        index_embeddings(pairs)
+        update_chunk_status(ids, "embedded")
+        cleanup_chunks(ids)
+        print(f"✅ Updated and cleaned up {len(ids)} chunks.")
+    except Exception as e:
+        print(f"❌ Failed during indexing: {e}")
+        print("⚠️ Cleanup skipped to avoid deleting unsaved chunks.")

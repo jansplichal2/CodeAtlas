@@ -64,7 +64,7 @@ def db_load():
     load_chunks_to_sqlite()
 
 
-@app.command("embed-run")
+@app.command("index")
 def embed_run(batch_size: int = 100):
     typer.echo(f"🚀 Embedding up to {batch_size} ready chunks...")
     embed_ready_chunks(batch_size=batch_size)
