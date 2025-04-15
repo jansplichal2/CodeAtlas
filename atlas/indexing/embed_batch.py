@@ -1,8 +1,13 @@
 import openai
 import time
 from typing import List, Tuple
-from atlas.memory.storage import connect_db
-from atlas.config import MAX_TOKENS, EMBED_MODEL
+from atlas.memory.storage import connect_db, update_chunk_status
+from atlas.indexing.qdrant_index import index_embeddings
+from atlas.config import MAX_TOKENS
+import tiktoken
+
+ENCODER = tiktoken.get_encoding("cl100k_base")
+EMBED_MODEL = "text-embedding-3-small"
 
 
 def get_ready_chunks(limit: int = 100) -> List[Tuple[int, str]]:
@@ -44,4 +49,8 @@ def embed_ready_chunks(batch_size: int = 100):
     ids, texts = zip(*ready)
     embeddings = embed_chunk_texts(list(texts))
     print(f"🔗 Embedded {len(embeddings)} chunks.")
-    return list(zip(ids, embeddings))
+
+    pairs = list(zip(ids, embeddings))
+    index_embeddings(pairs)
+    update_chunk_status(ids, "embedded")
+    print(f"✅ Updated status in SQLite for {len(ids)} chunks.")
