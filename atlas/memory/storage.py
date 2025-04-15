@@ -1,5 +1,3 @@
-# Stub for SQLite-based memory
-
 import sqlite3
 from typing import List, Dict
 from datetime import datetime
@@ -52,4 +50,14 @@ def insert_chunk_records(chunks: List[Dict]):
                     datetime.utcnow().isoformat()
                 )
             )
+        conn.commit()
+
+
+def update_chunk_status(ids: List[int], new_status: str):
+    with connect_db() as conn:
+        cur = conn.cursor()
+        cur.executemany(
+            "UPDATE chunks SET status = ? WHERE id = ?",
+            [(new_status, chunk_id) for chunk_id in ids]
+        )
         conn.commit()
