@@ -1,13 +1,10 @@
 import openai
 import time
+import os
 from typing import List, Tuple
 from atlas.memory.storage import connect_db, update_chunk_status
 from atlas.indexing.qdrant_index import index_embeddings
-from atlas.config import MAX_TOKENS
-import tiktoken
-
-ENCODER = tiktoken.get_encoding("cl100k_base")
-EMBED_MODEL = "text-embedding-3-small"
+from atlas.config import MAX_TOKENS, CHUNK_DIR, EMBED_MODEL
 
 
 def get_ready_chunks(limit: int = 100) -> List[Tuple[int, str]]:
@@ -40,6 +37,16 @@ def embed_chunk_texts(chunk_texts: List[str]) -> List[List[float]]:
                 raise
 
 
+def cleanup_chunks(ids: List[int]):
+    for chunk_id in ids:
+        for file in CHUNK_DIR.glob(f"*{chunk_id}*.json"):
+            try:
+                os.remove(file)
+                print(f"🧹 Removed {file.name}")
+            except Exception as e:
+                print(f"⚠️ Failed to remove {file.name}: {e}")
+
+
 def embed_ready_chunks(batch_size: int = 100):
     ready = get_ready_chunks(limit=batch_size)
     if not ready:
@@ -53,4 +60,5 @@ def embed_ready_chunks(batch_size: int = 100):
     pairs = list(zip(ids, embeddings))
     index_embeddings(pairs)
     update_chunk_status(ids, "embedded")
-    print(f"✅ Updated status in SQLite for {len(ids)} chunks.")
+    cleanup_chunks(ids)
+    print(f"✅ Updated and cleaned up {len(ids)} chunks.")
