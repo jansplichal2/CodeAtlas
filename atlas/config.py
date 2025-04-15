@@ -12,3 +12,7 @@ PROJECT_ROOT = Path(".").resolve()
 CHUNK_DIR = PROJECT_ROOT / ".chunks"
 DB_PATH = PROJECT_ROOT / ".codeatlas.sqlite"
 MAX_TOKENS = 8192
+
+EMBED_MODEL = "text-embedding-3-small"
+QDRANT_COLLECTION = "codeatlas_chunks"
+QDRANT_DIM = 1536  # For text-embedding-3-small

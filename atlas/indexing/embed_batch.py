@@ -2,9 +2,7 @@ import openai
 import time
 from typing import List, Tuple
 from atlas.memory.storage import connect_db
-from atlas.config import MAX_TOKENS
-
-EMBED_MODEL = "text-embedding-3-small"
+from atlas.config import MAX_TOKENS, EMBED_MODEL
 
 
 def get_ready_chunks(limit: int = 100) -> List[Tuple[int, str]]:

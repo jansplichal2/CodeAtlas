@@ -1,11 +1,8 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, Distance, VectorParams
-from atlas.config import PROJECT_ROOT
+from atlas.config import PROJECT_ROOT, QDRANT_COLLECTION, QDRANT_DIM
 from typing import List, Tuple
 import numpy as np
-
-QDRANT_COLLECTION = "codeatlas_chunks"
-QDRANT_DIM = 1536  # For text-embedding-3-small
 
 client = QdrantClient(path=PROJECT_ROOT / ".qdrant")
 
