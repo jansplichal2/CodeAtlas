@@ -18,7 +18,7 @@ It uses language-aware chunking, token-safe validation, vector embeddings, and m
 
 ## 📦 Project Structure
 
-```bash
+```
 .chunks/               # Individual serialized code chunks
 .codeatlas.sqlite      # SQLite DB for tracking chunks
 atlas/
@@ -26,3 +26,21 @@ atlas/
 ├── memory/            # SQLite schema, loader
 ├── config.py          # Central paths & constants
 ├── cli.py             # Typer-based CLI entry point
+```
+
+---
+
+## 🧭 Full Embedding & Indexing Flow
+
+```bash
+# 1. Chunk the codebase and inspect structure
+codeatlas init ./my_project
+
+# 2. Save chunks to .chunks/ and validate token limits
+codeatlas embed ./my_project --dry-run
+
+# 3. Load valid chunks into SQLite
+codeatlas db-load
+
+# 4. Embed, index in Qdrant, update DB, and delete chunk files
+codeatlas index
