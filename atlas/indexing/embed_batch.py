@@ -7,11 +7,11 @@ from atlas.indexing.qdrant_index import index_embeddings
 from atlas.config import MAX_TOKENS, CHUNK_DIR, EMBED_MODEL
 
 
-def get_ready_chunks(limit: int = 100) -> List[Tuple[int, str]]:
+def get_ready_chunks(limit: int = 100) -> List[Tuple[str, str]]:
     with connect_db() as conn:
         cur = conn.cursor()
         cur.execute(
-            "SELECT id, source FROM chunks WHERE status = 'ready' AND tokens <= ? LIMIT ?",
+            "SELECT chunk_id, source FROM chunks WHERE status = 'ready' AND tokens <= ? LIMIT ?",
             (MAX_TOKENS, limit)
         )
         return cur.fetchall()
@@ -37,9 +37,10 @@ def embed_chunk_texts(chunk_texts: List[str]) -> List[List[float]]:
                 raise
 
 
-def cleanup_chunks(ids: List[int]):
-    for chunk_id in ids:
-        for file in CHUNK_DIR.glob(f"*{chunk_id}*.json"):
+def cleanup_chunks(chunk_ids: List[str]):
+    for chunk_id in chunk_ids:
+        file = CHUNK_DIR / f"chunk_{chunk_id}.json"
+        if file.exists():
             try:
                 os.remove(file)
                 print(f"🧹 Removed {file.name}")
@@ -53,17 +54,17 @@ def embed_ready_chunks(batch_size: int = 100):
         print("✅ No ready chunks to embed.")
         return
 
-    ids, texts = zip(*ready)
+    chunk_ids, texts = zip(*ready)
     embeddings = embed_chunk_texts(list(texts))
     print(f"🔗 Embedded {len(embeddings)} chunks.")
 
-    pairs = list(zip(ids, embeddings))
+    pairs = list(zip(chunk_ids, embeddings))
 
     try:
         index_embeddings(pairs)
-        update_chunk_status(ids, "embedded")
-        cleanup_chunks(ids)
-        print(f"✅ Updated and cleaned up {len(ids)} chunks.")
+        update_chunk_status(chunk_ids, "embedded")
+        cleanup_chunks(chunk_ids)
+        print(f"✅ Updated and cleaned up {len(chunk_ids)} chunks.")
     except Exception as e:
         print(f"❌ Failed during indexing: {e}")
         print("⚠️ Cleanup skipped to avoid deleting unsaved chunks.")

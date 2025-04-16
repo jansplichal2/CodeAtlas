@@ -1,7 +1,6 @@
-# Stub for embedding logic
-
 import json
 from typing import List
+import uuid
 import tiktoken
 from atlas.indexing.base_chunker import CodeChunk
 from atlas.config import CHUNK_DIR, MAX_TOKENS
@@ -16,10 +15,13 @@ def ensure_chunk_dir():
 def save_chunks_to_files(chunks: List[CodeChunk]):
     ensure_chunk_dir()
     for chunk in chunks:
-        name_hash = f"{chunk.chunk_type}_{chunk.name or 'anon'}_{chunk.start_line}_{chunk.end_line}".replace("/", "_")
-        path = CHUNK_DIR / f"{name_hash}.json"
+        chunk_id = str(uuid.uuid4())
+        data = chunk.to_dict()
+        data["chunk_id"] = chunk_id
+        filename = f"chunk_{chunk_id}.json"
+        path = CHUNK_DIR / filename
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(chunk.to_dict(), f, indent=2)
+            json.dump(data, f, indent=2)
 
 
 def dry_run_validate_chunks():

@@ -3,10 +3,10 @@ from typing import List, Dict
 from datetime import datetime
 from atlas.config import DB_PATH
 
-
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS chunks (
     id INTEGER PRIMARY KEY,
+    chunk_id TEXT UNIQUE,
     chunk_type TEXT,
     name TEXT,
     start_line INTEGER,
@@ -35,10 +35,14 @@ def insert_chunk_records(chunks: List[Dict]):
     with connect_db() as conn:
         cur = conn.cursor()
         for chunk in chunks:
+            chunk_id = chunk.get("chunk_id")
+            if not chunk_id:
+                continue  # Skip if not properly prepared
             cur.execute(
-                "INSERT INTO chunks (chunk_type, name, start_line, end_line, file_path, source, tokens, status, created_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO chunks (chunk_id, chunk_type, name, start_line, end_line, file_path, source, tokens, status, created_at) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
+                    chunk_id,
                     chunk["type"],
                     chunk.get("name"),
                     chunk["start_line"],
@@ -53,11 +57,11 @@ def insert_chunk_records(chunks: List[Dict]):
         conn.commit()
 
 
-def update_chunk_status(ids: List[int], new_status: str):
+def update_chunk_status(ids: List[str], new_status: str):
     with connect_db() as conn:
         cur = conn.cursor()
         cur.executemany(
-            "UPDATE chunks SET status = ? WHERE id = ?",
+            "UPDATE chunks SET status = ? WHERE chunk_id = ?",
             [(new_status, chunk_id) for chunk_id in ids]
         )
         conn.commit()
