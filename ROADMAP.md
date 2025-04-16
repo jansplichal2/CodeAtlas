@@ -32,17 +32,17 @@ A step-by-step plan to build an AI-powered semantic explorer for legacy codebase
 
 ---
 
-## 🚧 Phase 4: Embedding + Vector Indexing
+## ✅ Phase 4: Embedding + Vector Indexing
 
-- [ ] Select `ready` chunks from SQLite
-- [ ] Generate embeddings using OpenAI API
-- [ ] Index vectors into Qdrant
-- [ ] Mark successfully indexed chunks as `embedded` in SQLite
-- [ ] Handle failed embeddings (retry, mark `failed`, preserve file)
+- [x] Select `ready` chunks from SQLite
+- [x] Generate embeddings using OpenAI API
+- [x] Index vectors into Qdrant
+- [x] Mark successfully indexed chunks as `embedded` in SQLite
+- [x] Handle failed embeddings (retry, mark `failed`, preserve file)
 
 ---
 
-## ⏳ Phase 5: Query + Agent Framework (planned)
+## 🚧 Phase 5: Query + Agent Framework
 
 - [ ] Semantic search over indexed chunks
 - [ ] Explain / summarize code using LLM
