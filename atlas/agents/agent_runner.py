@@ -10,12 +10,12 @@ def run_agents_on_query(user_query: str, max_steps: int = 3):
 
     # Step 1: Get context from vector DB
     context = context_agent.run(user_query, top_k=5)
-    print(f"\n📚 Retrieved {len(context)} context items")
+    print(f"\\n📚 Retrieved {len(context)} context items")
 
     # Step 2: Let decision agent reason with tools
     result = decision_agent.run(user_goal=user_query, context=context)
 
-    print(f"\n✅ Final output from DecisionAndQueryAgent:")
+    print(f"\\n✅ Final output from DecisionAndQueryAgent:")
     for step in result:
         print(f"→ Tool: {step['tool']}")
         print(f"  Result: {step['result']}")
@@ -23,4 +23,5 @@ def run_agents_on_query(user_query: str, max_steps: int = 3):
 
 
 if __name__ == "__main__":
-    run_agents_on_query("SELECT * FROM chunks LIMIT 3")
+    # Simulate a broken SQL to trigger fallback to vector DB
+    run_agents_on_query("SELECT * FROM non_existing_table", max_steps=3)
