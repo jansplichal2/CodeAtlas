@@ -1,7 +1,7 @@
 import typer
 from pathlib import Path
 from atlas.chunking.chunk_dispatcher import get_chunker
-from atlas.indexing.embedder import save_chunks_to_files, validate_chunks
+from atlas.chunking.chunker import save_chunks_to_files, validate_chunks
 from atlas.indexing.embed_batch import embed_ready_chunks
 from atlas.sqlite.loader import load_chunks_to_sqlite
 from atlas.config import CHUNK_ERROR_DIR

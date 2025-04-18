@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List
 from atlas.chunking.base_chunker import CodeChunk, BaseChunker
+from atlas.config import MAX_CHUNK_LINES
 
 try:
     import javalang
@@ -9,7 +10,6 @@ except ImportError:
 
 
 class JavaChunker(BaseChunker):
-    MAX_CHUNK_LINES = 80
 
     def extract_chunks_from_file(self, file_path: Path) -> List[CodeChunk]:
         if file_path.suffix != ".java":
@@ -31,7 +31,7 @@ class JavaChunker(BaseChunker):
             if hasattr(type_node, "name") and type_node.position:
                 start = type_node.position.line
                 end = self._find_scope_end(start, lines)
-                if end - start + 1 > self.MAX_CHUNK_LINES:
+                if end - start + 1 > MAX_CHUNK_LINES:
                     chunks.extend(
                         self._split_long_chunk(lines[start - 1:end], "class", type_node.name, start, file_path))
                 else:
@@ -42,7 +42,7 @@ class JavaChunker(BaseChunker):
                 if isinstance(member, javalang.tree.MethodDeclaration) and member.position:
                     start = member.position.line
                     end = self._find_scope_end(start, lines)
-                    if end - start + 1 > self.MAX_CHUNK_LINES:
+                    if end - start + 1 > MAX_CHUNK_LINES:
                         chunks.extend(
                             self._split_long_chunk(lines[start - 1:end], "method", member.name, start, file_path))
                     else:
@@ -73,7 +73,7 @@ class JavaChunker(BaseChunker):
         for i, line in enumerate(raw_lines):
             buffer.append(line)
             is_split_point = (
-                    len(buffer) >= self.MAX_CHUNK_LINES or
+                    len(buffer) >= MAX_CHUNK_LINES or
                     line.strip() == "" or
                     line.strip().startswith("//")
             )

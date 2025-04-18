@@ -2,10 +2,10 @@ import ast
 from pathlib import Path
 from typing import List
 from atlas.chunking.base_chunker import CodeChunk, BaseChunker
+from atlas.config import MAX_CHUNK_LINES
 
 
 class PythonChunker(BaseChunker):
-    MAX_CHUNK_LINES = 80
 
     def extract_chunks_from_file(self, file_path: Path) -> List[CodeChunk]:
         if file_path.suffix != ".py":
@@ -35,7 +35,7 @@ class PythonChunker(BaseChunker):
                 try:
                     start = node.lineno
                     end = node.end_lineno
-                    if end - start + 1 > self.MAX_CHUNK_LINES:
+                    if end - start + 1 > MAX_CHUNK_LINES:
                         chunks.extend(self._split_long_chunk(node, lines, file_path))
                     else:
                         chunk_source = "\\n".join(lines[start - 1:end])
@@ -67,7 +67,7 @@ class PythonChunker(BaseChunker):
         for i, line in enumerate(raw_lines):
             buffer.append(line)
             is_split_point = (
-                len(buffer) >= self.MAX_CHUNK_LINES or
+                len(buffer) >= MAX_CHUNK_LINES or
                 line.strip() == "" or
                 line.strip().startswith("#")
             )

@@ -13,6 +13,7 @@ CHUNK_DIR = PROJECT_ROOT / ".chunks"
 CHUNK_ERROR_DIR = PROJECT_ROOT / ".error_chunks"
 DB_PATH = PROJECT_ROOT / ".codeatlas.sqlite"
 MAX_TOKENS = 8192
+MAX_CHUNK_LINES = 80
 
 EMBED_MODEL = "text-embedding-3-small"
 QDRANT_COLLECTION = "codeatlas_chunks"

@@ -14,6 +14,8 @@ class SQLChunker(BaseChunker):
         statements = re.split(r";\s*\n", source_code)
 
         offset = 0
+        count = 1
+
         for stmt in statements:
             stmt = stmt.strip()
             if not stmt:
@@ -23,11 +25,13 @@ class SQLChunker(BaseChunker):
             chunks.append(CodeChunk(
                 chunk_type="sql_statement",
                 name=None,
+                chunk_no=count,
                 start_line=start_line,
                 end_line=end_line,
                 source=stmt,
                 file_path=str(file_path)
             ))
             offset = source_code.find(stmt, offset) + len(stmt)
+            count += 1
 
         return chunks
