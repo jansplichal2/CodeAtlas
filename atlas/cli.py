@@ -1,8 +1,8 @@
 import typer
 from pathlib import Path
 from atlas.chunking.chunk_dispatcher import get_chunker
-from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks
-from atlas.indexing.qdrant_index import embed_ready_chunks
+from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks, display_error_chunks
+from atlas.qdrant.qdrant_index import embed_ready_chunks
 from atlas.sqlite.loader import load_chunks_to_sqlite
 
 app = typer.Typer()
@@ -34,6 +34,12 @@ def chunk(path: str):
 def validate():
     typer.echo(f"🔍 Validating chunks ...")
     validate_chunks()
+
+
+@app.command()
+def errors():
+    typer.echo(f"🔍 Display chunks with errors ...")
+    display_error_chunks()
 
 
 @app.command("load-sqlite")

@@ -44,6 +44,22 @@ def cleanup_chunks():
     print(f"Removed {count} chunk files in total, leaving {errors} files with error")
 
 
+def display_error_chunks():
+    ensure_chunk_dir()
+    count = 0
+    errors = 0
+    for chunk_file in CHUNK_DIR.glob("*.json"):
+        with open(chunk_file, "r", encoding="utf-8") as r:
+            data = json.load(r)
+        if 'errors' not in data:
+            count += 1
+        else:
+            print(f"Chunk {chunk_file.name} has these errors {data['errors']}")
+            errors += 1
+
+    print(f"Found {count} correct chunk files, {errors} files have errors")
+
+
 def validate_chunks():
     ensure_chunk_dir()
     failed = []
