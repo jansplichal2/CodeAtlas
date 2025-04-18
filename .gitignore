@@ -1,0 +1,125 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Where chunks are stored
+.chunks/
+.error_chunks/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# mypy / static analysis
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre
+.pyre/
+
+# Bandit
+bandit.yaml
+
+# Pyright
+typings/
+
+# Pylint
+.pylint.d/
+
+# Ruff / Flake8 / Black / isort
+*.lint
+*.lintcache
+
+# Cython debug symbols
+cython_debug/
+
+# IDEs / text editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# VS Code settings (if you're sharing some)
+# !.vscode/settings.json
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Env files
+.env
+.env.*
+
+# SQLite DB
+*.sqlite3
+*.db
+
+# Logs
+*.log
+
+# Local build/dist artifacts
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Wheel files
+*.whl
+
+# PyCharm
+__pycache__/
+.idea/
+
+# Coverage reports
+coverage/
+
+# Local test result files
+*.pytest_cache/
