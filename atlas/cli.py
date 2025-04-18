@@ -1,8 +1,8 @@
 import typer
 from pathlib import Path
 from atlas.chunking.chunk_dispatcher import get_chunker
-from atlas.chunking.chunker import save_chunks_to_files, validate_chunks
-from atlas.indexing.embed_batch import embed_ready_chunks
+from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks
+from atlas.indexing.qdrant_index import embed_ready_chunks
 from atlas.sqlite.loader import load_chunks_to_sqlite
 from atlas.config import CHUNK_ERROR_DIR
 
@@ -47,6 +47,12 @@ def load_sqlite():
 def load_qdrant(batch_size: int = 100):
     typer.echo(f"🚀 Embedding up to {batch_size} ready chunks...")
     embed_ready_chunks(batch_size=batch_size)
+
+
+@app.command()
+def cleanup():
+    print('Cleaning up chunks')
+    cleanup_chunks()
 
 
 if __name__ == "__main__":

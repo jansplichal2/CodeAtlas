@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 from typing import List
 import uuid
@@ -26,6 +27,25 @@ def save_chunks_to_files(chunks: List[CodeChunk]):
             json.dump(data, f, indent=2)
 
 
+def cleanup_chunks():
+    ensure_chunk_dir()
+    count = 0
+    errors = 0
+    for chunk_file in CHUNK_DIR.glob("*.json"):
+        with open(chunk_file, "r", encoding="utf-8") as r:
+            data = json.load(r)
+        if 'errors' not in data:
+            try:
+                os.remove(chunk_file)
+                count += 1
+            except Exception as e:
+                print(f"⚠️ Failed to remove {chunk_file.name}: {e}")
+        else:
+            errors += 1
+
+    print(f"Removed {count} chunk files in total, leaving {errors} files with error")
+
+
 def validate_chunks():
     ensure_chunk_dir()
     failed = []
@@ -41,8 +61,8 @@ def validate_chunks():
             if 'errors' not in data:
                 data['errors'] = []
             data['errors'].append({
-                'error_type': 'validation_error',
-                'error_message': f"{chunk_file.name} too large: {token_count} tokens while maximum in {MAX_TOKENS}"
+                'source': 'validation',
+                'error': f"{chunk_file.name} too large: {token_count} tokens while maximum in {MAX_TOKENS}"
             })
             with open(chunk_file, "w", encoding="utf-8") as w:
                 w.write(json.dumps(data))
