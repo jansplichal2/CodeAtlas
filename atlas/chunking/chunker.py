@@ -1,18 +1,16 @@
 import json
 import os
-import shutil
 from typing import List
 import uuid
 import tiktoken
 from atlas.chunking.base_chunker import CodeChunk
-from atlas.config import CHUNK_DIR, CHUNK_ERROR_DIR,  MAX_TOKENS
+from atlas.config import CHUNK_DIR, MAX_TOKENS
 
 ENCODER = tiktoken.get_encoding("cl100k_base")
 
 
 def ensure_chunk_dir():
     CHUNK_DIR.mkdir(parents=True, exist_ok=True)
-    CHUNK_ERROR_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def save_chunks_to_files(chunks: List[CodeChunk]):
@@ -57,7 +55,6 @@ def validate_chunks():
         token_count = len(ENCODER.encode(source))
         if token_count > MAX_TOKENS:
             print(f"⚠️  {chunk_file.name} too large: {token_count} tokens")
-            print(f"⚠️  Moving {chunk_file.name} to: {CHUNK_ERROR_DIR}")
             if 'errors' not in data:
                 data['errors'] = []
             data['errors'].append({
@@ -67,7 +64,6 @@ def validate_chunks():
             with open(chunk_file, "w", encoding="utf-8") as w:
                 w.write(json.dumps(data))
             failed.append((chunk_file, token_count))
-            shutil.move(chunk_file, CHUNK_ERROR_DIR / chunk_file.name)
         else:
             ok += 1
     print(f"✅ Validation complete. Valid: {ok}, Over-limit: {len(failed)}")

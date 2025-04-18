@@ -4,7 +4,6 @@ from atlas.chunking.chunk_dispatcher import get_chunker
 from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks
 from atlas.indexing.qdrant_index import embed_ready_chunks
 from atlas.sqlite.loader import load_chunks_to_sqlite
-from atlas.config import CHUNK_ERROR_DIR
 
 app = typer.Typer()
 
@@ -33,7 +32,7 @@ def chunk(path: str):
 
 @app.command()
 def validate():
-    typer.echo(f"🔍 Validating chunks and moving the problematic ones to {CHUNK_ERROR_DIR}...")
+    typer.echo(f"🔍 Validating chunks ...")
     validate_chunks()
 
 
