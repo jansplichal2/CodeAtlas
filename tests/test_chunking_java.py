@@ -1,7 +1,7 @@
 import unittest
 import tempfile
 from pathlib import Path
-from atlas.indexing.java_chunker import JavaChunker  # Assuming this import is correct
+from atlas.chunking.java_chunker import JavaChunker  # Assuming this import is correct
 
 
 class TestJavaChunkingLongMethod(unittest.TestCase):

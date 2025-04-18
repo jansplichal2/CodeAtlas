@@ -1,7 +1,7 @@
 import unittest
 import tempfile
 from pathlib import Path
-from atlas.indexing.sql_chunker import SQLChunker
+from atlas.chunking.sql_chunker import SQLChunker
 
 
 class TestSQLChunkingMultipleStatements(unittest.TestCase):

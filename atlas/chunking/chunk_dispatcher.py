@@ -1,7 +1,7 @@
 from pathlib import Path
-from .python_chunker import PythonChunker
-from .java_chunker import JavaChunker
-from .sql_chunker import SQLChunker
+from atlas.chunking.python_chunker import PythonChunker
+from atlas.chunking.java_chunker import JavaChunker
+from atlas.chunking.sql_chunker import SQLChunker
 
 
 def get_chunker(file_path: Path):

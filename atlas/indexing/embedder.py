@@ -3,7 +3,7 @@ import shutil
 from typing import List
 import uuid
 import tiktoken
-from atlas.indexing.base_chunker import CodeChunk
+from atlas.chunking.base_chunker import CodeChunk
 from atlas.config import CHUNK_DIR, CHUNK_ERROR_DIR,  MAX_TOKENS
 
 ENCODER = tiktoken.get_encoding("cl100k_base")

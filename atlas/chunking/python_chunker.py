@@ -1,7 +1,7 @@
 import ast
 from pathlib import Path
 from typing import List
-from .base_chunker import CodeChunk, BaseChunker
+from atlas.chunking.base_chunker import CodeChunk, BaseChunker
 
 
 class PythonChunker(BaseChunker):

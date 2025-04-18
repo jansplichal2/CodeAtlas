@@ -1,7 +1,7 @@
 import unittest
 import tempfile
 from pathlib import Path
-from atlas.indexing.python_chunker import PythonChunker  # Assuming this import is correct
+from atlas.chunking.python_chunker import PythonChunker  # Assuming this import is correct
 
 
 class TestPythonChunkingLongMethod(unittest.TestCase):
