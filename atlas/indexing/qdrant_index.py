@@ -1,6 +1,6 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, Distance, VectorParams
-from atlas.memory.storage import connect_db
+from atlas.sqlite.storage import connect_db
 from atlas.config import QDRANT_COLLECTION, QDRANT_DIM, QDRANT_HOST, QDRANT_PORT
 from typing import List, Tuple
 import numpy as np

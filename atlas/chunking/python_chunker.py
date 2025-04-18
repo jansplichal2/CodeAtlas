@@ -23,6 +23,7 @@ class PythonChunker(BaseChunker):
                 chunks.append(CodeChunk(
                     chunk_type="docstring",
                     name=None,
+                    chunk_no=1,
                     start_line=docstring_node.lineno,
                     end_line=docstring_node.end_lineno,
                     source="\\n".join(lines[docstring_node.lineno - 1:docstring_node.end_lineno]),
@@ -41,6 +42,7 @@ class PythonChunker(BaseChunker):
                         chunks.append(CodeChunk(
                             chunk_type=type(node).__name__.lower(),
                             name=node.name,
+                            chunk_no=1,
                             start_line=start,
                             end_line=end,
                             source=chunk_source,
@@ -60,6 +62,7 @@ class PythonChunker(BaseChunker):
         name = node.name
 
         sub_start_line = start
+        count = 1
         buffer = []
         for i, line in enumerate(raw_lines):
             buffer.append(line)
@@ -71,8 +74,9 @@ class PythonChunker(BaseChunker):
             if is_split_point:
                 sub_end_line = sub_start_line + len(buffer) - 1
                 chunks.append(CodeChunk(
-                    chunk_type=f"{chunk_type}_part",
-                    name=f"{name}_part{i}",
+                    chunk_type=chunk_type,
+                    name=name,
+                    chunk_no=count,
                     start_line=sub_start_line,
                     end_line=sub_end_line,
                     source="\\n".join(buffer),
@@ -84,8 +88,9 @@ class PythonChunker(BaseChunker):
         if buffer:
             sub_end_line = sub_start_line + len(buffer) - 1
             chunks.append(CodeChunk(
-                chunk_type=f"{chunk_type}_part",
-                name=f"{name}_tail",
+                chunk_type=chunk_type,
+                name=name,
+                chunk_no=count,
                 start_line=sub_start_line,
                 end_line=sub_end_line,
                 source="\\n".join(buffer),

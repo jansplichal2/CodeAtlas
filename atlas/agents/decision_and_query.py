@@ -1,5 +1,5 @@
-from atlas.tools.vector_db_tool import VectorDBTool
-from atlas.tools.relational_db_tool import RelationalDBTool
+from atlas.agents.tools.vector_db_tool import VectorDBTool
+from atlas.agents.tools.relational_db_tool import RelationalDBTool
 
 
 class DecisionAndQueryAgent:

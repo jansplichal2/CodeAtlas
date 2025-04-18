@@ -1,5 +1,5 @@
 import sqlite3
-from atlas.tools.base import BaseTool
+from atlas.agents.tools.base import BaseTool
 from atlas.config import DB_PATH
 
 

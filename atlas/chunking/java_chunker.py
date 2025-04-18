@@ -35,7 +35,7 @@ class JavaChunker(BaseChunker):
                     chunks.extend(
                         self._split_long_chunk(lines[start - 1:end], "class", type_node.name, start, file_path))
                 else:
-                    chunks.append(CodeChunk("class", type_node.name, start, end, "\\n".join(lines[start - 1:end]),
+                    chunks.append(CodeChunk("class", 1, type_node.name, start, end, "\\n".join(lines[start - 1:end]),
                                             str(file_path)))
 
             for member in getattr(type_node, "body", []):
@@ -46,7 +46,7 @@ class JavaChunker(BaseChunker):
                         chunks.extend(
                             self._split_long_chunk(lines[start - 1:end], "method", member.name, start, file_path))
                     else:
-                        chunks.append(CodeChunk("method", member.name, start, end, "\\n".join(lines[start - 1:end]),
+                        chunks.append(CodeChunk("method", 1, member.name, start, end, "\\n".join(lines[start - 1:end]),
                                                 str(file_path)))
 
         return chunks
@@ -68,6 +68,7 @@ class JavaChunker(BaseChunker):
         chunks = []
         buffer = []
         sub_start_line = start_line
+        count = 1
 
         for i, line in enumerate(raw_lines):
             buffer.append(line)
@@ -79,8 +80,9 @@ class JavaChunker(BaseChunker):
             if is_split_point:
                 sub_end_line = sub_start_line + len(buffer) - 1
                 chunks.append(CodeChunk(
-                    chunk_type=f"{chunk_type}_part",
-                    name=f"{name}_part{i}",
+                    chunk_type=chunk_type,
+                    name=name,
+                    chunk_no=count,
                     start_line=sub_start_line,
                     end_line=sub_end_line,
                     source="\\n".join(buffer),
@@ -88,12 +90,14 @@ class JavaChunker(BaseChunker):
                 ))
                 sub_start_line = sub_end_line + 1
                 buffer = []
+                count += 1
 
         if buffer:
             sub_end_line = sub_start_line + len(buffer) - 1
             chunks.append(CodeChunk(
-                chunk_type=f"{chunk_type}_part",
-                name=f"{name}_tail",
+                chunk_type=chunk_type,
+                name=name,
+                chunk_no=count,
                 start_line=sub_start_line,
                 end_line=sub_end_line,
                 source="\\n".join(buffer),

@@ -1,4 +1,4 @@
-from atlas.tools.vector_db_tool import VectorDBTool
+from atlas.agents.tools.vector_db_tool import VectorDBTool
 
 
 class ContextualizerAgent:

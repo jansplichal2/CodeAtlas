@@ -2,7 +2,7 @@ import openai
 import time
 import os
 from typing import List, Tuple
-from atlas.memory.storage import connect_db, update_chunk_status
+from atlas.sqlite.storage import connect_db
 from atlas.indexing.qdrant_index import index_embeddings
 from atlas.config import MAX_TOKENS, CHUNK_DIR, EMBED_MODEL
 
@@ -62,7 +62,6 @@ def embed_ready_chunks(batch_size: int = 100):
 
     try:
         index_embeddings(pairs)
-        update_chunk_status(chunk_ids, "embedded")
         cleanup_chunks(chunk_ids)
         print(f"✅ Updated and cleaned up {len(chunk_ids)} chunks.")
     except Exception as e:

@@ -1,4 +1,4 @@
-from atlas.tools.base import BaseTool
+from atlas.agents.tools.base import BaseTool
 from qdrant_client import QdrantClient
 from atlas.config import QDRANT_HOST, QDRANT_PORT, QDRANT_COLLECTION, EMBED_MODEL
 import numpy as np

@@ -9,12 +9,12 @@ CREATE TABLE IF NOT EXISTS chunks (
     chunk_id TEXT UNIQUE,
     chunk_type TEXT,
     name TEXT,
+    chunk_no INTEGER,
     start_line INTEGER,
     end_line INTEGER,
     file_path TEXT,
     source TEXT,
     tokens INTEGER,
-    status TEXT DEFAULT 'ready',
     created_at TEXT
 );
 """
@@ -37,31 +37,32 @@ def insert_chunk_records(chunks: List[Dict]):
         for chunk in chunks:
             chunk_id = chunk.get("chunk_id")
             if not chunk_id:
-                continue  # Skip if not properly prepared
+                continue
             cur.execute(
-                "INSERT INTO chunks (chunk_id, chunk_type, name, start_line, end_line, file_path, source, tokens, status, created_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                """INSERT INTO chunks 
+                   (chunk_id, 
+                   chunk_type, 
+                   name,
+                   chunk_no,
+                   start_line, 
+                   end_line, 
+                   file_path, 
+                   source, 
+                   tokens, 
+                   created_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
                 (
                     chunk_id,
                     chunk["type"],
-                    chunk.get("name"),
+                    chunk["name"],
+                    chunk["chunk_no"],
                     chunk["start_line"],
                     chunk["end_line"],
                     chunk["file_path"],
                     chunk["source"],
-                    chunk.get("tokens"),
-                    chunk.get("status", "ready"),
+                    chunk.get("tokens", 0),
                     datetime.utcnow().isoformat()
                 )
             )
-        conn.commit()
-
-
-def update_chunk_status(ids: List[str], new_status: str):
-    with connect_db() as conn:
-        cur = conn.cursor()
-        cur.executemany(
-            "UPDATE chunks SET status = ? WHERE chunk_id = ?",
-            [(new_status, chunk_id) for chunk_id in ids]
-        )
         conn.commit()

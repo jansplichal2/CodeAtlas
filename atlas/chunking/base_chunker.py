@@ -6,6 +6,7 @@ class CodeChunk:
     def __init__(
         self,
         chunk_type: str,
+        chunk_no: int,
         name: Optional[str],
         start_line: int,
         end_line: int,
@@ -14,6 +15,7 @@ class CodeChunk:
     ):
         self.chunk_type = chunk_type
         self.name = name
+        self.chunk_no = chunk_no
         self.start_line = start_line
         self.end_line = end_line
         self.source = source
@@ -23,6 +25,7 @@ class CodeChunk:
         return {
             "type": self.chunk_type,
             "name": self.name,
+            "chunk_no": self.chunk_no,
             "start_line": self.start_line,
             "end_line": self.end_line,
             "file_path": self.file_path,
