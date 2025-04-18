@@ -54,25 +54,17 @@ def big_function():
 
         print(f"Extracted {len(chunks)} chunks:")  # Optional: for debugging/info
         for c in chunks:
-            # Assuming chunk object has attributes: chunk_type, name, start_line, end_line
-            # Adjust if your chunk object structure is different
             print(
                 f" - Chunk Name: {getattr(c, 'name', 'N/A')}, Start: {getattr(c, 'start_line', 'N/A')}, End: {getattr(c, 'end_line', 'N/A')}")
 
-        # Assert that the long function was split into more than one chunk
         self.assertGreater(len(chunks), 1, "Expected function to be split into multiple chunks")
 
-        # Assert that at least one chunk has 'part' in its name
-        # Filters out chunks where c.name might be None or empty
         has_part_chunk = any("part" in c.name for c in chunks if getattr(c, 'name', None))
         self.assertTrue(has_part_chunk, "Expected at least one chunk name to contain 'part'")
 
-        # Assert that all chunks include the original function name 'big_function'
-        # Filters out chunks where c.name might be None or empty
         all_chunks_named_correctly = all("big_function" in c.name for c in chunks if getattr(c, 'name', None))
         self.assertTrue(all_chunks_named_correctly, "All chunk names should include 'big_function'")
 
 
-# Standard boilerplate to run the tests
 if __name__ == '__main__':
     unittest.main()

@@ -10,6 +10,6 @@ def get_chunker(file_path: Path):
         return PythonChunker()
     elif suffix == ".java":
         return JavaChunker()
-    elif suffix in [".sql", ".psql"]:
+    elif suffix in [".sql", ".tsql"]:
         return SQLChunker()
     raise ValueError(f"No chunker implemented for file type: {suffix}")

@@ -34,12 +34,3 @@ class BaseChunker:
     def extract_chunks_from_file(self, file_path: Path) -> List[CodeChunk]:
         raise NotImplementedError
 
-    def extract_chunks_from_dir(self, directory: Path) -> List[CodeChunk]:
-        all_chunks = []
-        for file_path in directory.rglob("*"):
-            if file_path.is_file():
-                try:
-                    all_chunks.extend(self.extract_chunks_from_file(file_path))
-                except Exception:
-                    continue
-        return all_chunks
