@@ -47,7 +47,7 @@ pip install -e .
 ## 📦 CLI Usage
 
 ```bash
-python -m atlas <command> [OPTIONS]
+python -m atlas.cli <command> [OPTIONS]
 ```
 
 ---
@@ -59,7 +59,7 @@ python -m atlas <command> [OPTIONS]
 Chunk all matching files under a root directory for further processing.
 
 ```bash
-atlas chunk <ROOT> -e <EXT> [-e <EXT> ...] [-x <DIR> ...]
+atlas.cli chunk <ROOT> -e <EXT> [-e <EXT> ...] [-x <DIR> ...]
 ```
 
 **Arguments:**
@@ -76,7 +76,7 @@ atlas chunk <ROOT> -e <EXT> [-e <EXT> ...] [-x <DIR> ...]
 Validate the syntax or structure of previously chunked files.
 
 ```bash
-atlas validate
+atlas.cli validate
 ```
 
 Runs internal validators on chunks stored in `.chunks/` and reports issues.
@@ -86,7 +86,7 @@ Runs internal validators on chunks stored in `.chunks/` and reports issues.
 Display only the chunks with validation errors.
 
 ```bash
-atlas errors
+atlas.cli errors
 ```
 
 Useful for inspecting what needs fixing before embedding or loading.
@@ -96,7 +96,7 @@ Useful for inspecting what needs fixing before embedding or loading.
 Load chunk metadata into SQLite.
 
 ```bash
-atlas load-sqlite
+atlas.cli load-sqlite
 ```
 
 Loads information about all valid chunks into the configured local SQLite database.
@@ -106,7 +106,7 @@ Loads information about all valid chunks into the configured local SQLite databa
 Embed all valid chunks using the configured embedding provider and model.
 
 ```bash
-atlas embed
+atlas.cli embed
 ```
 
 Embeddings are attached to each chunk and saved for vector indexing.
@@ -116,7 +116,7 @@ Embeddings are attached to each chunk and saved for vector indexing.
 Push embedded chunks into Qdrant vector DB.
 
 ```bash
-atlas load-qdrant
+atlas.cli load-qdrant
 ```
 
 Uses the stored embeddings and metadata to populate your Qdrant collection.
@@ -126,7 +126,7 @@ Uses the stored embeddings and metadata to populate your Qdrant collection.
 Remove all generated chunks from the `.chunks/` folder.
 
 ```bash
-atlas cleanup
+atlas.cli cleanup
 ```
 
 Use this if you want a clean slate before reprocessing files.
@@ -146,22 +146,22 @@ Use this if you want a clean slate before reprocessing files.
 
 ```bash
 # Chunk all Python and SQL files
-atlas chunk src/ -e py -e sql -x __pycache__
+atlas.cli chunk src/ -e py -e sql -x __pycache__
 
 # Validate chunks
-atlas validate
+atlas.cli validate
 
 # View errors if any
-atlas errors
+atlas.cli errors
 
 # Load metadata into SQLite
-atlas load-sqlite
+atlas.cli load-sqlite
 
 # Embed chunks
-atlas embed
+atlas.cli embed
 
 # Index in Qdrant
-atlas load-qdrant
+atlas.cli load-qdrant
 ```
 
 
