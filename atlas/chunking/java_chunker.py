@@ -1,85 +1,74 @@
+import tree_sitter_java
+
 from pathlib import Path
 from typing import List
-from atlas.chunking.base_chunker import CodeChunk, BaseChunker
+from tree_sitter import Language, Parser
+from atlas.chunking.base_chunker import BaseChunker, CodeChunk
 from atlas.config import MAX_CHUNK_LINES
 
-try:
-    import javalang
-except ImportError:
-    javalang = None
+JAVA_LANGUAGE = Language(tree_sitter_java.language())
 
 
 class JavaChunker(BaseChunker):
+
+    def __init__(self):
+        self.parser = Parser(JAVA_LANGUAGE)
 
     def extract_chunks_from_file(self, file_path: Path) -> List[CodeChunk]:
         if file_path.suffix != ".java":
             return []
 
-        if javalang is None:
-            raise ImportError("javalang must be installed for Java chunking")
-
         source_code = file_path.read_text(encoding="utf-8")
-        chunks = []
+        tree = self.parser.parse(bytes(source_code, "utf8"))
+        root_node = tree.root_node
         lines = source_code.splitlines()
-
-        try:
-            tree = javalang.parse.parse(source_code)
-        except Exception as e:
-            raise ValueError(f"Java parse error: {e}")
-
-        for type_node in tree.types:
-            if hasattr(type_node, "name") and type_node.position:
-                start = type_node.position.line
-                end = self._find_scope_end(start, lines)
-                if end - start + 1 > MAX_CHUNK_LINES:
-                    chunks.extend(
-                        self._split_long_chunk(lines[start - 1:end], "class", type_node.name, start, file_path))
-                else:
-                    chunks.append(CodeChunk("class", 1, type_node.name, start, end, "\\n".join(lines[start - 1:end]),
-                                            str(file_path)))
-
-            for member in getattr(type_node, "body", []):
-                if isinstance(member, javalang.tree.MethodDeclaration) and member.position:
-                    start = member.position.line
-                    end = self._find_scope_end(start, lines)
-                    if end - start + 1 > MAX_CHUNK_LINES:
-                        chunks.extend(
-                            self._split_long_chunk(lines[start - 1:end], "method", member.name, start, file_path))
-                    else:
-                        chunks.append(CodeChunk("method", 1, member.name, start, end, "\\n".join(lines[start - 1:end]),
-                                                str(file_path)))
-
-        return chunks
-
-    def _find_scope_end(self, start_line: int, lines: List[str]) -> int:
-        brace_level = 0
-        in_scope = False
-        for i in range(start_line - 1, len(lines)):
-            line = lines[i]
-            brace_level += line.count("{")
-            brace_level -= line.count("}")
-            if "{" in line:
-                in_scope = True
-            if in_scope and brace_level == 0:
-                return i + 1
-        return len(lines)
-
-    def _split_long_chunk(self, raw_lines, chunk_type, name, start_line, file_path: Path) -> List[CodeChunk]:
         chunks = []
-        buffer = []
-        sub_start_line = start_line
-        count = 1
 
-        for i, line in enumerate(raw_lines):
-            buffer.append(line)
-            is_split_point = (
-                    len(buffer) >= MAX_CHUNK_LINES or
-                    line.strip() == "" or
-                    line.strip().startswith("//")
-            )
-            if is_split_point:
+        def walk_tree(cursor, callback):
+            reached_root = False
+            while not reached_root:
+                callback(cursor.node)
+                if cursor.goto_first_child():
+                    continue
+                if cursor.goto_next_sibling():
+                    continue
+                while True:
+                    if not cursor.goto_parent():
+                        reached_root = True
+                        break
+                    if cursor.goto_next_sibling():
+                        break
+
+        def split_long_chunk(raw_lines, chunk_type, name, start_line):
+            subchunks = []
+            buffer = []
+            sub_start_line = start_line
+            count = 1
+            for i, line in enumerate(raw_lines):
+                buffer.append(line)
+                is_split_point = (
+                        len(buffer) >= MAX_CHUNK_LINES
+                        or line.strip() == ""
+                        or line.strip().startswith("//")
+                )
+                if is_split_point:
+                    sub_end_line = sub_start_line + len(buffer) - 1
+                    count += 1
+                    subchunks.append(CodeChunk(
+                        chunk_type=chunk_type,
+                        name=name,
+                        chunk_no=count,
+                        start_line=sub_start_line,
+                        end_line=sub_end_line,
+                        source="\\n".join(buffer),
+                        file_path=str(file_path)
+                    ))
+                    sub_start_line = sub_end_line + 1
+                    buffer = []
+            if buffer:
                 sub_end_line = sub_start_line + len(buffer) - 1
-                chunks.append(CodeChunk(
+                count += 1
+                subchunks.append(CodeChunk(
                     chunk_type=chunk_type,
                     name=name,
                     chunk_no=count,
@@ -88,20 +77,28 @@ class JavaChunker(BaseChunker):
                     source="\\n".join(buffer),
                     file_path=str(file_path)
                 ))
-                sub_start_line = sub_end_line + 1
-                buffer = []
-                count += 1
+            return subchunks
 
-        if buffer:
-            sub_end_line = sub_start_line + len(buffer) - 1
-            chunks.append(CodeChunk(
-                chunk_type=chunk_type,
-                name=name,
-                chunk_no=count,
-                start_line=sub_start_line,
-                end_line=sub_end_line,
-                source="\\n".join(buffer),
-                file_path=str(file_path)
-            ))
+        def collect_node(node):
+            if node.type in {"class_declaration", "method_declaration"}:
+                name_node = node.child_by_field_name("name")
+                name = name_node.text.decode("utf8") if name_node else "<anon>"
+                start = node.start_point
+                end = node.end_point
+                chunk_type = node.type.replace("_", "")
+                source_lines = lines[start.row:end.row + 1]
+                if len(source_lines) > MAX_CHUNK_LINES:
+                    chunks.extend(split_long_chunk(source_lines, chunk_type, name, start.row + 1))
+                else:
+                    chunks.append(CodeChunk(
+                        chunk_type=chunk_type,
+                        name=name,
+                        chunk_no=1,
+                        start_line=start.row + 1,
+                        end_line=end.row + 1,
+                        source="\\n".join(source_lines),
+                        file_path=str(file_path)
+                    ))
 
+        walk_tree(root_node.walk(), collect_node)
         return chunks

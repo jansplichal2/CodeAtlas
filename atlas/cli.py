@@ -48,7 +48,9 @@ def chunk(
                 chunks = chunker.extract_chunks_from_file(file_path)
                 all_chunks.extend(chunks)
             except Exception as e:
+                import traceback
                 typer.echo(f"⚠️ Skipped {file_path.name}: {e}")
+                raise ValueError(f"Java parse error:\n{traceback.format_exc()}")
 
     save_chunks_to_files(all_chunks)
     typer.echo(f"💾 Saved {len(all_chunks)} chunks to .chunks/")
