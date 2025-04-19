@@ -15,3 +15,6 @@ class BaseEmbedder:
 
     def retrieve_embedding(self, chunks: List[Embedding]) -> List[Embedding]:
         raise NotImplementedError
+
+    def retrieve_embedding_for_query(self, query: str):
+        raise NotImplementedError

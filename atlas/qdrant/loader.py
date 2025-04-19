@@ -1,4 +1,6 @@
 import json
+from typing import List
+
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, Distance, VectorParams
 from atlas.config import QDRANT_COLLECTION, QDRANT_DIM, QDRANT_HOST, QDRANT_PORT,CHUNK_DIR
@@ -39,6 +41,11 @@ def load_chunks_to_qdrant():
     print(f"📌 Indexed {len(records)} chunks into Qdrant.")
 
 
-def test_qdrant_query(query: str):
-    pass
+def test_qdrant_query(embedding: List[float], limit: int):
+    results = client.search(
+        collection_name=QDRANT_COLLECTION,
+        query_vector=np.array(embedding, dtype=np.float32).tolist(),
+        limit=limit
+    )
+    return results
 

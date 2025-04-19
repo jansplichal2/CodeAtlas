@@ -2,6 +2,7 @@ import openai
 import time
 from typing import List
 
+from atlas.config import EMBED_MODEL
 from atlas.embedding.base_embedder import BaseEmbedder, Embedding
 
 
@@ -35,3 +36,7 @@ class OpenAIEmbedder(BaseEmbedder):
                             chunk['errors'] = []
                         chunk['errors'].append({'source': 'embedding', 'error': str(e)})
                     return chunks
+
+    def retrieve_embedding_for_query(self, query: str):
+        embedding = openai.embeddings.create(input=query, model=EMBED_MODEL).data[0].embedding
+        return embedding

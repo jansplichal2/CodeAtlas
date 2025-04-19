@@ -5,7 +5,9 @@ from pprint import pprint
 from pathlib import Path
 from atlas.chunking.chunk_dispatcher import get_chunker
 from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks, display_error_chunks
+from atlas.config import EMBED_PROVIDER, EMBED_MODEL
 from atlas.embedding.embedder import embed_chunks
+from atlas.embedding.embedding_dispatcher import get_embedder
 
 from atlas.sqlite.loader import load_chunks_to_sqlite, test_sql_query
 from atlas.qdrant.loader import load_chunks_to_qdrant, test_qdrant_query
@@ -99,7 +101,9 @@ def test_sqlite(query: str):
 @app.command("test-qdrant")
 def test_qdrant(query: str):
     typer.echo(f"Running semantic query {query}...")
-    rows = test_qdrant_query(query)
+    embedder = get_embedder(EMBED_PROVIDER, EMBED_MODEL)
+    embedding = embedder.retrieve_embedding_for_query(query)
+    rows = test_qdrant_query(embedding, 10)
     for row in rows:
         pprint(dict(row))
 
