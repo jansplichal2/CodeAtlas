@@ -3,10 +3,10 @@ from typing import List
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, Distance, VectorParams
-from atlas.config import QDRANT_COLLECTION, QDRANT_DIM, QDRANT_HOST, QDRANT_PORT,CHUNK_DIR
+from atlas.config import QDRANT_COLLECTION, QDRANT_DIM, QDRANT_PATH, CHUNK_DIR
 import numpy as np
 
-client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
+client = QdrantClient(path=QDRANT_PATH)
 
 
 def ensure_qdrant_collection():
