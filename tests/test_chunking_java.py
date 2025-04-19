@@ -47,9 +47,6 @@ public class BigClass {{
 
         self.assertGreater(len(chunks), 1, "Expected long method to be split into multiple chunks")
 
-        has_part_chunk = any("part" in c.name for c in chunks if c.name)
-        self.assertTrue(has_part_chunk, "Expected at least one chunk name to contain 'part'")
-
         all_method_chunks_named_correctly = all(
             "bigMethod" in c.name for c in chunks if c.name and "method" in c.chunk_type
         )

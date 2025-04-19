@@ -7,7 +7,7 @@ from atlas.config import PROJECT_ROOT
 class TestSQLChunkingMultipleStatements(unittest.TestCase):
 
     def test_sql_chunking_large_file(self):
-        sql_file = PROJECT_ROOT / Path("../tests/testdata/huge_test.sql")
+        sql_file = PROJECT_ROOT / Path("tests/testdata/huge_test.sql")
         chunker = SQLChunker()
         chunks = chunker.extract_chunks_from_file(sql_file)
 

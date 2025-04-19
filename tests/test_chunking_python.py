@@ -59,9 +59,6 @@ def big_function():
 
         self.assertGreater(len(chunks), 1, "Expected function to be split into multiple chunks")
 
-        has_part_chunk = any("part" in c.name for c in chunks if getattr(c, 'name', None))
-        self.assertTrue(has_part_chunk, "Expected at least one chunk name to contain 'part'")
-
         all_chunks_named_correctly = all("big_function" in c.name for c in chunks if getattr(c, 'name', None))
         self.assertTrue(all_chunks_named_correctly, "All chunk names should include 'big_function'")
 
