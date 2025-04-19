@@ -7,8 +7,8 @@ from atlas.chunking.chunk_dispatcher import get_chunker
 from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks, display_error_chunks
 from atlas.embedding.embedder import embed_chunks
 
-from atlas.sqlite.loader import load_chunks_to_sqlite, test_query
-from atlas.qdrant.loader import load_chunks_to_qdrant
+from atlas.sqlite.loader import load_chunks_to_sqlite, test_sql_query
+from atlas.qdrant.loader import load_chunks_to_qdrant, test_qdrant_query
 from atlas.utils import iter_files
 
 app = typer.Typer()
@@ -78,7 +78,7 @@ def embed():
 
 @app.command("load-qdrant")
 def load_qdrant():
-    typer.echo(f"🚀 Embedding chunks with vectors...")
+    typer.echo(f"🚀 Loading chunks into qdrant...")
     load_chunks_to_qdrant()
 
 
@@ -91,7 +91,15 @@ def cleanup():
 @app.command("test-sqlite")
 def test_sqlite(query: str):
     typer.echo(f"Running SQL query {query}...")
-    rows = test_query(query)
+    rows = test_sql_query(query)
+    for row in rows:
+        pprint(dict(row))
+
+
+@app.command("test-qdrant")
+def test_qdrant(query: str):
+    typer.echo(f"Running semantic query {query}...")
+    rows = test_qdrant_query(query)
     for row in rows:
         pprint(dict(row))
 

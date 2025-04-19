@@ -30,4 +30,8 @@ class OpenAIEmbedder(BaseEmbedder):
                     time.sleep(delay)
                     delay *= 2
                 else:
-                    raise Exception('Max attempts failed')
+                    for chunk in chunks:
+                        if 'errors' not in chunk:
+                            chunk['errors'] = []
+                        chunk['errors'].append({'source': 'embedding', 'error': str(e)})
+                    return chunks

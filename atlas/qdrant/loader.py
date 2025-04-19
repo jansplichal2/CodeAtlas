@@ -38,3 +38,7 @@ def load_chunks_to_qdrant():
     client.upsert(collection_name=QDRANT_COLLECTION, points=records)
     print(f"📌 Indexed {len(records)} chunks into Qdrant.")
 
+
+def test_qdrant_query(query: str):
+    pass
+

@@ -24,6 +24,7 @@ def save_embeddings(chunks_with_embedding):
 
 def embed_chunks():
     chunks = []
+    batch_no = 1
     embedder = get_embedder(EMBED_PROVIDER, EMBED_MODEL)
     for chunk_file in CHUNK_DIR.glob("*.json"):
         with open(chunk_file, "r", encoding="utf-8") as f:
@@ -32,11 +33,14 @@ def embed_chunks():
             source = data.get('source', '')
             chunks.append(Embedding(chunk_id, source))
         if len(chunks) >= 100:
+            print(f"Running batch num {batch_no}")
             chunks_with_embedding = embedder.retrieve_embedding(chunks)
             save_embeddings(chunks_with_embedding)
             chunks = []
+            batch_no += 1
 
     if len(chunks) > 0:
+        print(f"Running batch num {batch_no}. This batch is the last.")
         chunks_with_embedding = embedder.retrieve_embedding(chunks)
         save_embeddings(chunks_with_embedding)
 

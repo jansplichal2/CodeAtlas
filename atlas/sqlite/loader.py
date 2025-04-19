@@ -73,7 +73,7 @@ def insert_chunk_record(conn: Any, chunk: Dict) -> Tuple[bool, str]:
         return True, str(e)
 
 
-def test_query(query: str):
+def test_sql_query(query: str):
     with connect_db() as conn:
         cursor = conn.cursor()
         cursor.execute(query)
