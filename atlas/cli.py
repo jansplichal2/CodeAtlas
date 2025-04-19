@@ -5,8 +5,9 @@ from pprint import pprint
 from pathlib import Path
 from atlas.chunking.chunk_dispatcher import get_chunker
 from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks, display_error_chunks
-from atlas.qdrant.qdrant_index import embed_ready_chunks
+
 from atlas.sqlite.loader import load_chunks_to_sqlite, test_query
+from atlas.qdrant.loader import load_chunks_to_qdrant
 from atlas.utils import iter_files
 
 app = typer.Typer()
@@ -69,9 +70,9 @@ def load_sqlite():
 
 
 @app.command("load-qdrant")
-def load_qdrant(batch_size: int = 100):
-    typer.echo(f"🚀 Embedding up to {batch_size} ready chunks...")
-    embed_ready_chunks(batch_size=batch_size)
+def load_qdrant():
+    typer.echo(f"🚀 Embedding chunks with vectors...")
+    load_chunks_to_qdrant()
 
 
 @app.command()
