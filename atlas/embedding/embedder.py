@@ -1,28 +1,42 @@
 import json
 
-from atlas.config import CHUNK_DIR
+from atlas.config import CHUNK_DIR, EMBED_MODEL, EMBED_PROVIDER
+from atlas.embedding.base_embedder import Embedding
+from atlas.embedding.embedding_dispatcher import get_embedder
 
 
-def embed_ready_chunks(batch_size: int = 100):
+def save_embeddings(chunks_with_embedding):
+    for chunk in chunks_with_embedding:
+        chunk_file = CHUNK_DIR / f"chunk_{chunk.chunk_id}.json"
+        with open(chunk_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if len(chunk.errors) > 0:
+                if 'errors' not in data:
+                    data['errors'] = []
+                data['errors'].append({'source': 'embedding', 'error': '\n'.join(chunk.errors)})
+                with open(chunk_file, "r+", encoding="utf-8") as w:
+                    json.dump(data, w, indent=2)
+            else:
+                with open(chunk_file, "r+", encoding="utf-8") as w:
+                    data['embedding'] = chunk.embedding
+                    json.dump(data, w, indent=2)
+
+
+def embed_chunks():
+    chunks = []
+    embedder = get_embedder(EMBED_PROVIDER, EMBED_MODEL)
     for chunk_file in CHUNK_DIR.glob("*.json"):
         with open(chunk_file, "r", encoding="utf-8") as f:
             data = json.load(f)
+            chunk_id = data['chunk_id']
+            source = data.get('source', '')
+            chunks.append(Embedding(chunk_id, source))
+        if len(chunks) >= 100:
+            chunks_with_embedding = embedder.retrieve_embedding(chunks)
+            save_embeddings(chunks_with_embedding)
+            chunks = []
 
-    # ready = get_ready_chunks(limit=batch_size)
-    # if not ready:
-    #     print("✅ No ready chunks to embed.")
-    #     return
-    #
-    # chunk_ids, texts = zip(*ready)
-    # embeddings = embed_chunk_texts(list(texts))
-    # print(f"🔗 Embedded {len(embeddings)} chunks.")
-    #
-    # pairs = list(zip(chunk_ids, embeddings))
-    #
-    # try:
-    #     index_embeddings(pairs)
-    #     cleanup_chunks(chunk_ids)
-    #     print(f"✅ Updated and cleaned up {len(chunk_ids)} chunks.")
-    # except Exception as e:
-    #     print(f"❌ Failed during indexing: {e}")
-    #     print("⚠️ Cleanup skipped to avoid deleting unsaved chunks.")
+    if len(chunks) > 0:
+        chunks_with_embedding = embedder.retrieve_embedding(chunks)
+        save_embeddings(chunks_with_embedding)
+

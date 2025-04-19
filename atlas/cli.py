@@ -5,6 +5,7 @@ from pprint import pprint
 from pathlib import Path
 from atlas.chunking.chunk_dispatcher import get_chunker
 from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks, display_error_chunks
+from atlas.embedding.embedder import embed_chunks
 
 from atlas.sqlite.loader import load_chunks_to_sqlite, test_query
 from atlas.qdrant.loader import load_chunks_to_qdrant
@@ -67,6 +68,12 @@ def errors():
 def load_sqlite():
     typer.echo("📥 Loading chunk metadata into SQLite...")
     load_chunks_to_sqlite()
+
+
+@app.command()
+def embed():
+    typer.echo(f"🚀 Getting embeddings for chunks...")
+    embed_chunks()
 
 
 @app.command("load-qdrant")

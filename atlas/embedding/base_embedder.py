@@ -6,6 +6,7 @@ class Embedding:
         self.chunk_id = chunk_id
         self.chunk_text = chunk_text
         self.embedding = []
+        self.errors = []
 
 
 class BaseEmbedder:
