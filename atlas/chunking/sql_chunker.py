@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List
 from atlas.chunking.base_chunker import CodeChunk, BaseChunker
+from atlas.config import MAX_CHUNK_LINES
 import re
 
 
@@ -11,27 +12,76 @@ class SQLChunker(BaseChunker):
 
         source_code = file_path.read_text(encoding="utf-8")
         chunks = []
-        statements = re.split(r";\s*\n", source_code)
+        statements = re.split(r";\\s*\\n", source_code)
 
         offset = 0
-        count = 1
 
         for stmt in statements:
             stmt = stmt.strip()
             if not stmt:
                 continue
-            start_line = source_code[:source_code.find(stmt, offset)].count("\n") + 1
-            end_line = start_line + stmt.count("\n")
+            start_line = source_code[:source_code.find(stmt, offset)].count("\\n") + 1
+            end_line = start_line + stmt.count("\\n")
+
+            lines = stmt.splitlines()
+            if len(lines) > MAX_CHUNK_LINES:
+                subchunks = self._split_long_sql(lines, start_line, file_path)
+                chunks.extend(subchunks)
+            else:
+                chunks.append(CodeChunk(
+                    chunk_type="sql_statement",
+                    name=None,
+                    chunk_no=1,
+                    start_line=start_line,
+                    end_line=end_line,
+                    source=stmt,
+                    file_path=str(file_path)
+                ))
+
+            offset = source_code.find(stmt, offset) + len(stmt)
+
+        return chunks
+
+    def _split_long_sql(self, lines: List[str], start_line: int, file_path: Path) -> List[CodeChunk]:
+        chunks = []
+        buffer = []
+        sub_start_line = start_line
+        count = 0
+
+        for i, line in enumerate(lines):
+            buffer.append(line)
+            is_split_point = (
+                len(buffer) >= MAX_CHUNK_LINES
+                or line.strip() == ""
+                or line.strip().startswith("--")
+            )
+            if is_split_point:
+                count += 1
+                sub_end_line = sub_start_line + len(buffer) - 1
+                chunks.append(CodeChunk(
+                    chunk_type="sql_statement_part",
+                    name=f"statement_part_{count}",
+                    chunk_no=count,
+                    start_line=sub_start_line,
+                    end_line=sub_end_line,
+                    source="\\n".join(buffer),
+                    file_path=str(file_path)
+                ))
+                sub_start_line = sub_end_line + 1
+                buffer = []
+                count += 1
+
+        if buffer:
+            count += 1
+            sub_end_line = sub_start_line + len(buffer) - 1
             chunks.append(CodeChunk(
-                chunk_type="sql_statement",
-                name=None,
+                chunk_type="sql_statement_part",
+                name=f"statement_part_tail",
                 chunk_no=count,
-                start_line=start_line,
-                end_line=end_line,
-                source=stmt,
+                start_line=sub_start_line,
+                end_line=sub_end_line,
+                source="\\n".join(buffer),
                 file_path=str(file_path)
             ))
-            offset = source_code.find(stmt, offset) + len(stmt)
-            count += 1
 
         return chunks
