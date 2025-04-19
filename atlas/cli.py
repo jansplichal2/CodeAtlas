@@ -68,14 +68,6 @@ def load_sqlite():
     load_chunks_to_sqlite()
 
 
-@app.command("test-sqlite")
-def test_sqlite(query: str):
-    typer.echo(f"Running SQL query {query}...")
-    rows = test_query(query)
-    for row in rows:
-        pprint(dict(row))
-
-
 @app.command("load-qdrant")
 def load_qdrant(batch_size: int = 100):
     typer.echo(f"🚀 Embedding up to {batch_size} ready chunks...")
@@ -88,7 +80,15 @@ def cleanup():
     cleanup_chunks()
 
 
-@app.command("test-chunk-files")
+@app.command("test-sqlite")
+def test_sqlite(query: str):
+    typer.echo(f"Running SQL query {query}...")
+    rows = test_query(query)
+    for row in rows:
+        pprint(dict(row))
+
+
+@app.command("test-list-files")
 def test_chunk_files(
         root: Path = typer.Argument(..., exists=True, file_okay=False, resolve_path=True),
         include_ext: List[str] = typer.Option(
