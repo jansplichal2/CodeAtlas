@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS chunks (
 
 def connect_db():
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL;")
     return conn
 
@@ -70,6 +71,15 @@ def insert_chunk_record(conn: Any, chunk: Dict) -> Tuple[bool, str]:
         return False, ''
     except Exception as e:
         return True, str(e)
+
+
+def test_query(query: str):
+    with connect_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        print(f"{len(rows)} rows returned")
+        return rows
 
 
 def load_chunks_to_sqlite():

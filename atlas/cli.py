@@ -1,9 +1,10 @@
 import typer
+from pprint import pprint
 from pathlib import Path
 from atlas.chunking.chunk_dispatcher import get_chunker
 from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks, display_error_chunks
 from atlas.qdrant.qdrant_index import embed_ready_chunks
-from atlas.sqlite.loader import load_chunks_to_sqlite
+from atlas.sqlite.loader import load_chunks_to_sqlite, test_query
 
 app = typer.Typer()
 
@@ -48,6 +49,14 @@ def load_sqlite():
     load_chunks_to_sqlite()
 
 
+@app.command("test-sqlite")
+def test_sqlite(query: str):
+    typer.echo(f"Running SQL query {query}...")
+    rows = test_query(query)
+    for row in rows:
+        pprint(dict(row))
+
+
 @app.command("load-qdrant")
 def load_qdrant(batch_size: int = 100):
     typer.echo(f"🚀 Embedding up to {batch_size} ready chunks...")
@@ -56,7 +65,7 @@ def load_qdrant(batch_size: int = 100):
 
 @app.command()
 def cleanup():
-    print('Cleaning up chunks')
+    typer.echo('Cleaning up chunks')
     cleanup_chunks()
 
 
