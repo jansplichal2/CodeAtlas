@@ -1,3 +1,5 @@
+from typing import List
+
 import typer
 from pprint import pprint
 from pathlib import Path
@@ -5,6 +7,7 @@ from atlas.chunking.chunk_dispatcher import get_chunker
 from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks, display_error_chunks
 from atlas.qdrant.qdrant_index import embed_ready_chunks
 from atlas.sqlite.loader import load_chunks_to_sqlite, test_query
+from atlas.utils import iter_files
 
 app = typer.Typer()
 
@@ -67,6 +70,31 @@ def load_qdrant(batch_size: int = 100):
 def cleanup():
     typer.echo('Cleaning up chunks')
     cleanup_chunks()
+
+
+@app.command("test-chunk-files")
+def test_(
+    root: Path = typer.Argument(..., exists=True, file_okay=False, resolve_path=True),
+    include_ext: List[str] = typer.Option(
+        ...,
+        "--ext",
+        "-e",
+        help="File extension(s) to include. Repeat the flag for multiple.",
+        show_default=False,
+    ),
+    exclude_dir: List[str] = typer.Option(
+        None,
+        "--exclude-dir",
+        "-x",
+        help="Directory name(s) to skip. Repeat for multiple.",
+    ),
+):
+    """
+    Recursively list files below ROOT that match one or more -e/--ext extensions,
+    skipping hidden directories and any -x/--exclude-dir names.
+    """
+    for path in iter_files(root, include_ext, exclude_dir):
+        typer.echo(path)
 
 
 if __name__ == "__main__":
