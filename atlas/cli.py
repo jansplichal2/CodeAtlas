@@ -13,15 +13,31 @@ app = typer.Typer()
 
 
 @app.command()
-def chunk(path: str):
-    base_path = Path(path).resolve()
+def chunk(
+        root: Path = typer.Argument(..., exists=True, file_okay=False, resolve_path=True),
+        include_ext: List[str] = typer.Option(
+            ...,
+            "--ext",
+            "-e",
+            help="File extension(s) to include. Repeat the flag for multiple.",
+            show_default=False,
+        ),
+        exclude_dir: List[str] = typer.Option(
+            None,
+            "--exclude-dir",
+            "-x",
+            help="Directory name(s) to skip. Repeat for multiple.",
+        ),
+):
+    base_path = Path(root).resolve()
     if not base_path.exists():
         typer.echo(f"❌ Path does not exist: {base_path}")
         raise typer.Exit(code=1)
 
     typer.echo(f"🔍 Scanning and chunking for embedding: {base_path}")
     all_chunks = []
-    for file_path in base_path.rglob("*"):
+
+    for file_path in iter_files(root, include_ext, exclude_dir):
         if file_path.is_file():
             try:
                 chunker = get_chunker(file_path)
@@ -73,21 +89,21 @@ def cleanup():
 
 
 @app.command("test-chunk-files")
-def test_(
-    root: Path = typer.Argument(..., exists=True, file_okay=False, resolve_path=True),
-    include_ext: List[str] = typer.Option(
-        ...,
-        "--ext",
-        "-e",
-        help="File extension(s) to include. Repeat the flag for multiple.",
-        show_default=False,
-    ),
-    exclude_dir: List[str] = typer.Option(
-        None,
-        "--exclude-dir",
-        "-x",
-        help="Directory name(s) to skip. Repeat for multiple.",
-    ),
+def test_chunk_files(
+        root: Path = typer.Argument(..., exists=True, file_okay=False, resolve_path=True),
+        include_ext: List[str] = typer.Option(
+            ...,
+            "--ext",
+            "-e",
+            help="File extension(s) to include. Repeat the flag for multiple.",
+            show_default=False,
+        ),
+        exclude_dir: List[str] = typer.Option(
+            None,
+            "--exclude-dir",
+            "-x",
+            help="Directory name(s) to skip. Repeat for multiple.",
+        ),
 ):
     """
     Recursively list files below ROOT that match one or more -e/--ext extensions,
