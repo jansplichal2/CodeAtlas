@@ -19,13 +19,39 @@ It uses language-aware chunking, token-safe validation, vector embeddings, and m
 ## 📦 Project Structure
 
 ```
-.chunks/               # Individual serialized code chunks
-.codeatlas.sqlite      # SQLite DB for tracking chunks
-atlas/
-├── indexing/          # Chunkers, dispatcher, embedder
-├── memory/            # SQLite schema, loader
-├── config.py          # Central paths & constants
-├── cli.py             # Typer-based CLI entry point
+.
+├── README.md
+├── ROADMAP.md
+├── atlas
+│   ├── chunking
+│   │   ├── __init__.py
+│   │   ├── base_chunker.py
+│   │   ├── chunk_dispatcher.py
+│   │   ├── chunker.py
+│   │   ├── java_chunker.py
+│   │   ├── python_chunker.py
+│   │   └── sql_chunker.py
+│   ├── cli.py
+│   ├── config.py
+│   ├── embedding
+│   │   ├── base_embedder.py
+│   │   ├── embedder.py
+│   │   ├── embedding_dispatcher.py
+│   │   └── openai_embedder.py
+│   ├── qdrant
+│   │   ├── __init__.py
+│   │   └── loader.py
+│   ├── sqlite
+│   │   ├── __init__.py
+│   │   └── loader.py
+│   └── utils.py
+├── requirements.txt
+├── result.txt
+├── tests
+    ├── __init__.py
+    ├── test_chunking_java.py
+    ├── test_chunking_python.py
+    └── test_chunking_sql.py
 ```
 
 ---
