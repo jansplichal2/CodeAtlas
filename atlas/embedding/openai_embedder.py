@@ -1,9 +1,12 @@
+import logging
 import openai
 import time
 from typing import List
 
 from atlas.config import EMBED_MODEL
 from atlas.embedding.base_embedder import BaseEmbedder, Embedding
+
+logger = logging.getLogger(__name__)
 
 
 class OpenAIEmbedder(BaseEmbedder):
@@ -26,7 +29,7 @@ class OpenAIEmbedder(BaseEmbedder):
 
                 return chunks
             except openai.OpenAIError as e:
-                print(f"⚠️ Embedding failed (attempt {attempt + 1}): {e}")
+                logger.info(f"Embedding failed (attempt {attempt + 1}): {e}")
                 if attempt < max_retries - 1:
                     time.sleep(delay)
                     delay *= 2

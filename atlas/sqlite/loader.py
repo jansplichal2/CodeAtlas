@@ -1,8 +1,11 @@
 import json
+import logging
 import sqlite3
 from typing import Dict, Tuple, Any
 from datetime import datetime
 from atlas.config import CHUNK_DIR, DB_PATH
+
+logger = logging.getLogger(__name__)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS chunks (
@@ -78,7 +81,7 @@ def test_sql_query(query: str):
         cursor = conn.cursor()
         cursor.execute(query)
         rows = cursor.fetchall()
-        print(f"{len(rows)} rows returned")
+        logger.info(f"{len(rows)} rows returned")
         return rows
 
 
@@ -100,4 +103,4 @@ def load_chunks_to_sqlite():
                         data['errors'].append({'source': 'sqlite', 'error': error})
                         json.dump(data, w, indent=2)
 
-    print(f"✅ Inserted {count} chunks into SQLite. {errors} files finished with error")
+    logger.info(f"Inserted {count} chunks into SQLite. {errors} files finished with error")

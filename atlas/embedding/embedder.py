@@ -1,8 +1,11 @@
 import json
+import logging
 
 from atlas.config import CHUNK_DIR, EMBED_MODEL, EMBED_PROVIDER
 from atlas.embedding.base_embedder import Embedding
 from atlas.embedding.embedding_dispatcher import get_embedder
+
+logger = logging.getLogger(__name__)
 
 
 def save_embeddings(chunks_with_embedding):
@@ -33,14 +36,13 @@ def embed_chunks():
             source = data.get('source', '')
             chunks.append(Embedding(chunk_id, source))
         if len(chunks) >= 100:
-            print(f"Running batch num {batch_no}")
+            logger.info(f"Running batch num {batch_no}")
             chunks_with_embedding = embedder.retrieve_embedding(chunks)
             save_embeddings(chunks_with_embedding)
             chunks = []
             batch_no += 1
 
     if len(chunks) > 0:
-        print(f"Running batch num {batch_no}. This batch is the last.")
+        logger.info(f"Running batch num {batch_no}. This batch is the last.")
         chunks_with_embedding = embedder.retrieve_embedding(chunks)
         save_embeddings(chunks_with_embedding)
-

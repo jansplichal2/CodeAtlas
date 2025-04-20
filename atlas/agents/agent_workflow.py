@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_initial_context(query: str, vdb_tool: VectorDBTool) -> str:
-    print(f"Fetching initial context for: '{query}'")
+    logger.info(f"Fetching initial context for: '{query}'")
     try:
         # Use the VectorDBTool directly for simplicity here, or a raw client call
         params = VectorDBToolInputSchema(query=query, top_k=3)  # Get top 3 snippets initially
@@ -22,7 +22,7 @@ def get_initial_context(query: str, vdb_tool: VectorDBTool) -> str:
         context_str = "\n---\n".join([str(payload) for payload in results.results])
         return context_str if context_str else "No initial context found."
     except Exception as e:
-        print(f"Error fetching initial context: {e}")
+        logger.info(f"Error fetching initial context: {e}", exc_info=True)
         return f"Error fetching initial context: {e}"
 
 
@@ -182,4 +182,3 @@ if __name__ == "__main__":
 
     test_query = "What are the possible values for chunk_type?"
     # final_result = run_agent_workflow(test_query, main_agent, vdb_tool, rdb_tool)
-    # ... (print result)

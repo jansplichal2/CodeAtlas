@@ -1,3 +1,4 @@
+import logging
 import json
 import os
 from typing import List
@@ -7,6 +8,7 @@ from atlas.chunking.base_chunker import CodeChunk
 from atlas.config import CHUNK_DIR, MAX_TOKENS
 
 ENCODER = tiktoken.get_encoding("cl100k_base")
+logger = logging.getLogger(__name__)
 
 
 def ensure_chunk_dir():
@@ -37,11 +39,11 @@ def cleanup_chunks():
                 os.remove(chunk_file)
                 count += 1
             except Exception as e:
-                print(f"⚠️ Failed to remove {chunk_file.name}: {e}")
+                logger.info(f"Failed to remove {chunk_file.name}: {e}")
         else:
             errors += 1
 
-    print(f"Removed {count} chunk files in total, leaving {errors} files with error")
+    logger.info(f"Removed {count} chunk files in total, leaving {errors} files with error")
 
 
 def display_error_chunks():
@@ -54,10 +56,10 @@ def display_error_chunks():
         if 'errors' not in data:
             count += 1
         else:
-            print(f"Chunk {chunk_file.name} has these errors {data['errors']}")
+            logger.info(f"Chunk {chunk_file.name} has these errors {data['errors']}")
             errors += 1
 
-    print(f"Found {count} correct chunk files, {errors} files have errors")
+    logger.info(f"Found {count} correct chunk files, {errors} files have errors")
 
 
 def validate_chunks():
@@ -70,7 +72,7 @@ def validate_chunks():
         source = data.get("source", "")
         token_count = len(ENCODER.encode(source))
         if token_count > MAX_TOKENS:
-            print(f"⚠️  {chunk_file.name} too large: {token_count} tokens")
+            logger.info(f"{chunk_file.name} too large: {token_count} tokens")
             if 'errors' not in data:
                 data['errors'] = []
             data['errors'].append({
@@ -82,5 +84,5 @@ def validate_chunks():
             failed.append((chunk_file, token_count))
         else:
             ok += 1
-    print(f"✅ Validation complete. Valid: {ok}, Over-limit: {len(failed)}")
+    logger.info(f"Validation complete. Valid: {ok}, Over-limit: {len(failed)}")
     return failed

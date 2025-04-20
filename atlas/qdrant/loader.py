@@ -1,12 +1,14 @@
 import json
-from typing import List
+import logging
+import numpy as np
 
+from typing import List
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, Distance, VectorParams
 from atlas.config import QDRANT_COLLECTION, QDRANT_DIM, QDRANT_PATH, CHUNK_DIR
-import numpy as np
 
 client = QdrantClient(path=QDRANT_PATH)
+logger = logging.getLogger(__name__)
 
 
 def ensure_qdrant_collection():
@@ -38,7 +40,7 @@ def load_chunks_to_qdrant():
             }
         ))
     client.upsert(collection_name=QDRANT_COLLECTION, points=records)
-    print(f"📌 Indexed {len(records)} chunks into Qdrant.")
+    logger.info(f"Indexed {len(records)} chunks into Qdrant.")
 
 
 def test_qdrant_query(embedding: List[float], limit: int):
