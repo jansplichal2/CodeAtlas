@@ -26,7 +26,7 @@ class VectorDBToolInputSchema(BaseIOSchema):
     Input schema for vector database search.
     """
     query: str = Field(..., description="Text query to search in the vector database.")
-    top_k: int = Field(5, description="Number of top results to return.")
+    top_k: int = Field(10, description="Number of top results to return.")
 
 
 class VectorDBToolOutputSchema(BaseIOSchema):

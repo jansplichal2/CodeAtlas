@@ -123,3 +123,4 @@ coverage/
 
 # Local test result files
 *.pytest_cache/
+/.codeatlas.qdrant/
