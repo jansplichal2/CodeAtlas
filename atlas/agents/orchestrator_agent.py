@@ -57,7 +57,6 @@ CREATE TABLE IF NOT EXISTS chunks (
     end_line INTEGER,
     file_path TEXT,
     source TEXT,
-    tokens INTEGER,
     created_at TEXT
 );
 """
