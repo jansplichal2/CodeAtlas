@@ -32,11 +32,12 @@ def format_tool_output_for_llm(output: Union[VectorDBToolOutputSchema, Relationa
         if output.error:
             return f"Relational DB Tool Execution Failed: {output.error}"
         else:
-            # Convert list of dicts to a string format LLM can easily read
             return "Relational DB Tool Output:\n" + "\n".join(str(row) for row in output.rows)
     elif isinstance(output, VectorDBToolOutputSchema):
-        # Convert list of dicts (payloads) to a string format
-        return "Vector DB Tool Output:\n" + "\n".join(str(res) for res in output.results)
+        if output.error:
+            return f"Vector DB Tool Execution Failed: {output.error}"
+        else:
+            return "Vector DB Tool Output:\n" + "\n".join(str(res) for res in output.results)
     else:
         return "Error: Unknown tool output type."
 
