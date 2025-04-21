@@ -35,7 +35,7 @@ def embed_chunks():
             chunk_id = data['chunk_id']
             source = data.get('source', '')
             chunks.append(Embedding(chunk_id, source))
-        if len(chunks) >= 100:
+        if len(chunks) >= 30:
             logger.info(f"Running batch num {batch_no}")
             chunks_with_embedding = embedder.retrieve_embedding(chunks)
             save_embeddings(chunks_with_embedding)

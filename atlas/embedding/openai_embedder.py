@@ -14,7 +14,7 @@ class OpenAIEmbedder(BaseEmbedder):
         super().__init__(model_type)
 
     def retrieve_embedding(self, chunks: List[Embedding]) -> List[Embedding]:
-        max_retries = 5
+        max_retries = 3
         delay = 1
 
         for attempt in range(max_retries):
@@ -39,6 +39,7 @@ class OpenAIEmbedder(BaseEmbedder):
                             chunk['errors'] = []
                         chunk['errors'].append({'source': 'embedding', 'error': str(e)})
                     return chunks
+        return []
 
     def retrieve_embedding_for_query(self, query: str):
         embedding = openai.embeddings.create(input=query, model=EMBED_MODEL).data[0].embedding
