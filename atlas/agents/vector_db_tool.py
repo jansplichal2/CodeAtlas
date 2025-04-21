@@ -61,12 +61,12 @@ class VectorDBTool(BaseTool):
             return VectorDBToolOutputSchema(results=[], error=f"Retrieving OpenAI embedding failed: {e}")
 
         try:
-            results = self.qdrant_client.search(
+            results = self.qdrant_client.query_points(
                 collection_name=self.collection_name,
-                query_vector=embedding,
+                query=embedding,
                 limit=params.top_k
             )
-            hits = [hit.payload for hit in results]
+            hits = [hit.payload for hit in results.points]
             return VectorDBToolOutputSchema(results=hits, error='')
         except Exception as e:
             logger.error(f"Qdrant search failed: {e}", exc_info=True)

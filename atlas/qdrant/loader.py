@@ -44,10 +44,10 @@ def load_chunks_to_qdrant():
 
 
 def test_qdrant_query(embedding: List[float], limit: int):
-    results = client.search(
+    result = client.query_points(
         collection_name=QDRANT_COLLECTION,
-        query_vector=np.array(embedding, dtype=np.float32).tolist(),
+        query=embedding,
         limit=limit
     )
-    return results
+    return result.points
 
