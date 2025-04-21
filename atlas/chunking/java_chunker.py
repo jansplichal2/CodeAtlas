@@ -79,13 +79,21 @@ class JavaChunker(BaseChunker):
                 ))
             return subchunks
 
+        def resolve_type(original_type):
+            if original_type == "class_declaration":
+                return "class"
+            elif original_type == "method_declaration":
+                return "method"
+            else:
+                return "unknown"
+
         def collect_node(node):
             if node.type in {"class_declaration", "method_declaration"}:
                 name_node = node.child_by_field_name("name")
                 name = name_node.text.decode("utf8") if name_node else "<anon>"
                 start = node.start_point
                 end = node.end_point
-                chunk_type = node.type.replace("_", "")
+                chunk_type = resolve_type(node.type)
                 source_lines = lines[start.row:end.row + 1]
                 if len(source_lines) > MAX_CHUNK_LINES:
                     chunks.extend(split_long_chunk(source_lines, chunk_type, name, start.row + 1))

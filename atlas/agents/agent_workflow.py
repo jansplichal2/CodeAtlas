@@ -183,7 +183,7 @@ def run_agent_workflow(user_query: str, main_agent: BaseAgent, vector_db_tool: V
         return fallback_message
 
 
-SCHEMA = """
+SQLITE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS chunks (
     id INTEGER PRIMARY KEY,
     chunk_id TEXT UNIQUE,
@@ -196,6 +196,18 @@ CREATE TABLE IF NOT EXISTS chunks (
     source TEXT,
     created_at TEXT
 );
+"""
+
+QDRANT_SCHEMA = """
+{
+    "type": ,
+    "name": ,
+    "chunk_no": 1,
+    "start_line": 10,
+    "end_line": 60,
+    "file_path": ,
+    "source": ,
+}
 """
 
 
