@@ -22,7 +22,7 @@ def get_initial_context(query: str, vdb_tool: VectorDBTool) -> str:
     logger.info(f"Fetching initial context for: '{query}'")
     try:
         # Use the VectorDBTool directly for simplicity here, or a raw client call
-        params = VectorDBToolInputSchema(query=query, top_k=3)  # Get top 3 snippets initially
+        params = VectorDBToolInputSchema(query=query, top_k=5)  # Get top 5 snippets initially
         results: VectorDBToolOutputSchema = vdb_tool.run(params)
         # Format results into a string for the LLM
         context_str = "\n---\n".join([str(payload) for payload in results.results])
@@ -222,8 +222,8 @@ def run(query: str, sqlite_client, qdrant_client):
                 ],
                 steps=[
                     "First reason and then choose an action.",
-                    "If you can answer, choose final_answer and provide the final_answer.",
-                    "If you need more info, choose call_vector_db or call_relational_db and provide the necessary "
+                    "If you can answer with confidence, choose final_answer and provide the final_answer.",
+                    "You are encouraged to use tool when in doubt, choose call_vector_db or call_relational_db and provide the necessary "
                     "tool_parameters.",
                     "Use the provided context and potentially ask for specific tool calls to get missing information.",
                     "When you use call_relational_db create a query valid for this schema " + SQLITE_SCHEMA,
