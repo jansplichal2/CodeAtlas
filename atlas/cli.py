@@ -5,12 +5,15 @@ from typing import List
 from pprint import pprint
 from pathlib import Path
 
+from qdrant_client import QdrantClient
+
+from atlas.agents.agent_workflow import run
 from atlas.chunking.chunk_dispatcher import get_chunker
 from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks, display_error_chunks
-from atlas.config import EMBED_PROVIDER, EMBED_MODEL
+from atlas.config import EMBED_PROVIDER, EMBED_MODEL, QDRANT_PATH
 from atlas.embedding.embedder import embed_chunks
 from atlas.embedding.embedding_dispatcher import get_embedder
-from atlas.sqlite.loader import load_chunks_to_sqlite, test_sql_query
+from atlas.sqlite.loader import load_chunks_to_sqlite, test_sql_query, connect_db
 from atlas.qdrant.loader import load_chunks_to_qdrant, test_qdrant_query
 from atlas.utils import iter_files
 
@@ -115,6 +118,14 @@ def test_qdrant(query: str):
     rows = test_qdrant_query(embedding, 10)
     for row in rows:
         pprint(dict(row))
+
+
+@test_app.command("agent")
+def test_agent(query: str):
+    with connect_db() as sqlite:
+        qdrant = QdrantClient(path=QDRANT_PATH)
+        result = run(query, sqlite, qdrant)
+        pprint(result)
 
 
 @test_app.command("list-files")

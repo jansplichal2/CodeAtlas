@@ -1,10 +1,8 @@
-
 import logging
 
 from typing import Union, Optional, Literal
 from pydantic import Field
 
-from atomic_agents.lib.components.system_prompt_generator import SystemPromptGenerator
 from atomic_agents.lib.base.base_io_schema import BaseIOSchema
 from atomic_agents.agents.base_agent import BaseAgent, BaseAgentConfig
 
