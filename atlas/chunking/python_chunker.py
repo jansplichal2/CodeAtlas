@@ -15,6 +15,7 @@ class PythonChunker(BaseChunker):
             return []
 
         source_code = file_path.read_text(encoding="utf-8")
+        relative_file_path = file_path.relative_to(self.project_root)
         tree = ast.parse(source_code)
         lines = source_code.splitlines()
         chunks: List[CodeChunk] = []
@@ -30,7 +31,7 @@ class PythonChunker(BaseChunker):
                     start_line=docstring_node.lineno,
                     end_line=docstring_node.end_lineno,
                     source="\\n".join(lines[docstring_node.lineno - 1:docstring_node.end_lineno]),
-                    file_path=str(file_path)
+                    file_path=str(relative_file_path)
                 ))
 
         for node in ast.walk(tree):
@@ -39,7 +40,7 @@ class PythonChunker(BaseChunker):
                     start = node.lineno
                     end = node.end_lineno
                     if end - start + 1 > MAX_CHUNK_LINES:
-                        chunks.extend(self._split_long_chunk(node, lines, file_path))
+                        chunks.extend(self._split_long_chunk(node, lines, relative_file_path))
                     else:
                         chunk_source = "\\n".join(lines[start - 1:end])
                         chunks.append(CodeChunk(
@@ -49,7 +50,7 @@ class PythonChunker(BaseChunker):
                             start_line=start,
                             end_line=end,
                             source=chunk_source,
-                            file_path=str(file_path)
+                            file_path=str(relative_file_path)
                         ))
                 except AttributeError:
                     continue
@@ -64,7 +65,7 @@ class PythonChunker(BaseChunker):
         else:
             return "unknown"
 
-    def _split_long_chunk(self, node, lines, file_path: Path) -> List[CodeChunk]:
+    def _split_long_chunk(self, node, lines, relative_file_path: Path) -> List[CodeChunk]:
         chunks = []
         start = node.lineno
         end = node.end_lineno
@@ -91,7 +92,7 @@ class PythonChunker(BaseChunker):
                     start_line=sub_start_line,
                     end_line=sub_end_line,
                     source="\\n".join(buffer),
-                    file_path=str(file_path)
+                    file_path=str(relative_file_path)
                 ))
                 sub_start_line = sub_end_line + 1
                 buffer = []
@@ -105,7 +106,7 @@ class PythonChunker(BaseChunker):
                 start_line=sub_start_line,
                 end_line=sub_end_line,
                 source="\\n".join(buffer),
-                file_path=str(file_path)
+                file_path=str(relative_file_path)
             ))
 
         return chunks

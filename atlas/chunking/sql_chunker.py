@@ -13,6 +13,7 @@ class SQLChunker(BaseChunker):
         if file_path.suffix.lower() not in [".sql", ".psql"]:
             return []
 
+        relative_file_path = file_path.relative_to(self.project_root)
         source_code = file_path.read_text(encoding="utf-8")
         chunks = []
         statements = re.split(r";\\s*\\n", source_code)
@@ -28,7 +29,7 @@ class SQLChunker(BaseChunker):
 
             lines = stmt.splitlines()
             if len(lines) > MAX_CHUNK_LINES:
-                subchunks = self._split_long_sql(lines, start_line, file_path)
+                subchunks = self._split_long_sql(lines, start_line, relative_file_path)
                 chunks.extend(subchunks)
             else:
                 chunks.append(CodeChunk(
@@ -38,14 +39,14 @@ class SQLChunker(BaseChunker):
                     start_line=start_line,
                     end_line=end_line,
                     source=stmt,
-                    file_path=str(file_path)
+                    file_path=str(relative_file_path)
                 ))
 
             offset = source_code.find(stmt, offset) + len(stmt)
 
         return chunks
 
-    def _split_long_sql(self, lines: List[str], start_line: int, file_path: Path) -> List[CodeChunk]:
+    def _split_long_sql(self, lines: List[str], start_line: int, relative_file_path: Path) -> List[CodeChunk]:
         chunks = []
         buffer = []
         sub_start_line = start_line
@@ -68,7 +69,7 @@ class SQLChunker(BaseChunker):
                     start_line=sub_start_line,
                     end_line=sub_end_line,
                     source="\\n".join(buffer),
-                    file_path=str(file_path)
+                    file_path=str(relative_file_path)
                 ))
                 sub_start_line = sub_end_line + 1
                 buffer = []
@@ -84,7 +85,7 @@ class SQLChunker(BaseChunker):
                 start_line=sub_start_line,
                 end_line=sub_end_line,
                 source="\\n".join(buffer),
-                file_path=str(file_path)
+                file_path=str(relative_file_path)
             ))
 
         return chunks
