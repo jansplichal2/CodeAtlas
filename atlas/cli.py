@@ -19,6 +19,8 @@ logging.basicConfig(
 )
 
 app = typer.Typer()
+test_app = typer.Typer()
+app.add_typer(test_app, name="test")
 
 
 @app.command()
@@ -97,7 +99,7 @@ def cleanup():
     cleanup_chunks()
 
 
-@app.command("test-sqlite")
+@test_app.command("sqlite")
 def test_sqlite(query: str):
     typer.echo(f"Running SQL query {query}...")
     rows = test_sql_query(query)
@@ -105,7 +107,7 @@ def test_sqlite(query: str):
         pprint(dict(row))
 
 
-@app.command("test-qdrant")
+@test_app.command("qdrant")
 def test_qdrant(query: str):
     typer.echo(f"Running semantic query {query}...")
     embedder = get_embedder(EMBED_PROVIDER, EMBED_MODEL)
@@ -115,7 +117,7 @@ def test_qdrant(query: str):
         pprint(dict(row))
 
 
-@app.command("test-list-files")
+@test_app.command("list-files")
 def test_chunk_files(
         root: Path = typer.Argument(..., exists=True, file_okay=False, resolve_path=True),
         include_ext: List[str] = typer.Option(

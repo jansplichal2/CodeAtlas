@@ -124,3 +124,6 @@ coverage/
 # Local test result files
 *.pytest_cache/
 /.codeatlas.qdrant/
+/.codeatlas.sqlite
+/.codeatlas.sqlite-shm
+/.codeatlas.sqlite-wal
