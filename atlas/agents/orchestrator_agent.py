@@ -69,7 +69,7 @@ orchestrator_agent = BaseAgent(
             background=[
                 "You will receive a query and context, and your goal is to answer the query."
             ],
-            output_instructions=[
+            steps=[
                 "First reason and then choose an action.",
                 "If you can answer, choose final_answer and provide the final_answer.",
                 "If you need more info, choose call_vector_db or call_relational_db and provide the necessary "
