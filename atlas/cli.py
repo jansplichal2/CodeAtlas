@@ -5,7 +5,7 @@ from typing import List
 from pprint import pprint
 from pathlib import Path
 
-from qdrant_client import QdrantClient
+from atlas.qdrant.loader import client as qdrant_client
 
 from atlas.agents.agent_workflow import run
 from atlas.chunking.chunk_dispatcher import get_chunker
@@ -134,8 +134,7 @@ def test_qdrant(query: str):
 @test_app.command("agent")
 def test_agent(query: str):
     with connect_db() as sqlite:
-        qdrant = QdrantClient(path=QDRANT_PATH)
-        result = run(query, sqlite, qdrant)
+        result = run(query, sqlite, qdrant_client)
         pprint(result)
 
 

@@ -187,26 +187,26 @@ SQLITE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS chunks (
     id INTEGER PRIMARY KEY,
     chunk_id TEXT UNIQUE,
-    chunk_type TEXT,
-    name TEXT,
-    chunk_no INTEGER,
-    start_line INTEGER,
-    end_line INTEGER,
-    file_path TEXT,
-    source TEXT,
+    chunk_type TEXT, -- class, function, sql_statement or unknown
+    name TEXT, -- name of class or function
+    chunk_no INTEGER, -- if the class/function needs to be split into many parts, this is the part no
+    start_line INTEGER, -- start line in the source
+    end_line INTEGER, -- end line in the source
+    file_path TEXT, -- file path relative to project directory
+    source TEXT, -- source code
     created_at TEXT
 );
 """
 
 QDRANT_SCHEMA = """
 {
-    "type": ,
-    "name": ,
-    "chunk_no": 1,
-    "start_line": 10,
-    "end_line": 60,
-    "file_path": ,
-    "source": ,
+    "type": "function",  # class, function, sql_statement or unknown
+    "name": "getTarget", # name of class or function   
+    "chunk_no": 1,       # if the class/function needs to be split into many parts, this is the part no
+    "start_line": 10,    # start line in the source
+    "end_line": 60,      # end line in the source
+    "file_path": "myproject/authorization/authorization-base/src/main/java/domain/name/project/authorization/visitor/api/AuthorizationVisitor.java",       # file path relative to project directory
+    "source": "Here will be source code for getTarget function from line 10 to line 60",          # source code
 }
 """
 
@@ -226,7 +226,8 @@ def run(query: str, sqlite_client, qdrant_client):
                     "If you need more info, choose call_vector_db or call_relational_db and provide the necessary "
                     "tool_parameters.",
                     "Use the provided context and potentially ask for specific tool calls to get missing information.",
-                    "When you use call_relational_db create a query valid for this schema " + SCHEMA
+                    "When you use call_relational_db create a query valid for this schema " + SQLITE_SCHEMA,
+                    "When you use call_vector_db you use a semantic query - the output will be in this format " + QDRANT_SCHEMA
                 ],
             ),
             input_schema=ReasoningInputSchema,
