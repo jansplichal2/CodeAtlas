@@ -6,6 +6,9 @@ import re
 
 
 class SQLChunker(BaseChunker):
+    def __init__(self, project_root: Path):
+        super().__init__(project_root)
+
     def extract_chunks_from_file(self, file_path: Path) -> List[CodeChunk]:
         if file_path.suffix.lower() not in [".sql", ".psql"]:
             return []
@@ -30,7 +33,7 @@ class SQLChunker(BaseChunker):
             else:
                 chunks.append(CodeChunk(
                     chunk_type="sql_statement",
-                    name=None,
+                    name=f"statement_part_1",
                     chunk_no=1,
                     start_line=start_line,
                     end_line=end_line,
@@ -46,7 +49,7 @@ class SQLChunker(BaseChunker):
         chunks = []
         buffer = []
         sub_start_line = start_line
-        count = 0
+        count = 1
 
         for i, line in enumerate(lines):
             buffer.append(line)
@@ -59,7 +62,7 @@ class SQLChunker(BaseChunker):
                 count += 1
                 sub_end_line = sub_start_line + len(buffer) - 1
                 chunks.append(CodeChunk(
-                    chunk_type="sql_statement_part",
+                    chunk_type="sql_statement",
                     name=f"statement_part_{count}",
                     chunk_no=count,
                     start_line=sub_start_line,
@@ -75,8 +78,8 @@ class SQLChunker(BaseChunker):
             count += 1
             sub_end_line = sub_start_line + len(buffer) - 1
             chunks.append(CodeChunk(
-                chunk_type="sql_statement_part",
-                name=f"statement_part_tail",
+                chunk_type="sql_statement",
+                name=f"statement_part_{count}",
                 chunk_no=count,
                 start_line=sub_start_line,
                 end_line=sub_end_line,

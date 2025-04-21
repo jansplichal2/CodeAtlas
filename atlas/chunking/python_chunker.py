@@ -7,6 +7,9 @@ from atlas.config import MAX_CHUNK_LINES
 
 class PythonChunker(BaseChunker):
 
+    def __init__(self, project_root: Path):
+        super().__init__(project_root)
+
     def extract_chunks_from_file(self, file_path: Path) -> List[CodeChunk]:
         if file_path.suffix != ".py":
             return []
@@ -40,7 +43,7 @@ class PythonChunker(BaseChunker):
                     else:
                         chunk_source = "\\n".join(lines[start - 1:end])
                         chunks.append(CodeChunk(
-                            chunk_type=type(node).__name__.lower(),
+                            chunk_type=self.resolve_type(type(node).__name__.lower()),
                             name=node.name,
                             chunk_no=1,
                             start_line=start,
@@ -53,12 +56,20 @@ class PythonChunker(BaseChunker):
 
         return chunks
 
+    def resolve_type(self, original_type):
+        if original_type == "classdef":
+            return "class"
+        elif original_type == "functiondef":
+            return "function"
+        else:
+            return "unknown"
+
     def _split_long_chunk(self, node, lines, file_path: Path) -> List[CodeChunk]:
         chunks = []
         start = node.lineno
         end = node.end_lineno
         raw_lines = lines[start - 1:end]
-        chunk_type = type(node).__name__.lower()
+        chunk_type = self.resolve_type(type(node).__name__.lower())
         name = node.name
 
         sub_start_line = start

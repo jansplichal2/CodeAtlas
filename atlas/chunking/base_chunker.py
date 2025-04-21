@@ -34,6 +34,9 @@ class CodeChunk:
 
 
 class BaseChunker:
+    def __init__(self, project_root: Path):
+        self.project_root = project_root
+
     def extract_chunks_from_file(self, file_path: Path) -> List[CodeChunk]:
         raise NotImplementedError
 

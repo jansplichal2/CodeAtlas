@@ -11,7 +11,8 @@ JAVA_LANGUAGE = Language(tree_sitter_java.language())
 
 class JavaChunker(BaseChunker):
 
-    def __init__(self):
+    def __init__(self, project_root: Path):
+        super().__init__(project_root)
         self.parser = Parser(JAVA_LANGUAGE)
 
     def extract_chunks_from_file(self, file_path: Path) -> List[CodeChunk]:
@@ -19,6 +20,7 @@ class JavaChunker(BaseChunker):
             return []
 
         source_code = file_path.read_text(encoding="utf-8")
+        relative_file_path = file_path.relative_to(self.project_root)
         tree = self.parser.parse(bytes(source_code, "utf8"))
         root_node = tree.root_node
         lines = source_code.splitlines()
@@ -61,7 +63,7 @@ class JavaChunker(BaseChunker):
                         start_line=sub_start_line,
                         end_line=sub_end_line,
                         source="\\n".join(buffer),
-                        file_path=str(file_path)
+                        file_path=str(relative_file_path)
                     ))
                     sub_start_line = sub_end_line + 1
                     buffer = []
@@ -75,7 +77,7 @@ class JavaChunker(BaseChunker):
                     start_line=sub_start_line,
                     end_line=sub_end_line,
                     source="\\n".join(buffer),
-                    file_path=str(file_path)
+                    file_path=str(relative_file_path)
                 ))
             return subchunks
 
@@ -83,7 +85,7 @@ class JavaChunker(BaseChunker):
             if original_type == "class_declaration":
                 return "class"
             elif original_type == "method_declaration":
-                return "method"
+                return "function"
             else:
                 return "unknown"
 
@@ -105,7 +107,7 @@ class JavaChunker(BaseChunker):
                         start_line=start.row + 1,
                         end_line=end.row + 1,
                         source="\\n".join(source_lines),
-                        file_path=str(file_path)
+                        file_path=str(relative_file_path)
                     ))
 
         walk_tree(root_node.walk(), collect_node)

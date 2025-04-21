@@ -42,10 +42,21 @@ def chunk(
             "-x",
             help="Directory name(s) to skip. Repeat for multiple.",
         ),
+        project_root: str = typer.Option(
+            "/",
+            "--project-root",
+            "-p",
+            help="Root of the project directory.",
+        ),
 ):
     base_path = Path(root).resolve()
     if not base_path.exists():
         typer.echo(f"❌ Path does not exist: {base_path}")
+        raise typer.Exit(code=1)
+
+    project_root_path = Path(project_root).resolve()
+    if not project_root_path.exists():
+        typer.echo(f"❌ Project root not exist: {project_root_path}")
         raise typer.Exit(code=1)
 
     typer.echo(f"🔍 Scanning and chunking for embedding: {base_path}")
@@ -54,7 +65,7 @@ def chunk(
     for file_path in iter_files(root, include_ext, exclude_dir):
         if file_path.is_file():
             try:
-                chunker = get_chunker(file_path)
+                chunker = get_chunker(file_path, project_root_path)
                 chunks = chunker.extract_chunks_from_file(file_path)
                 all_chunks.extend(chunks)
             except Exception as e:
