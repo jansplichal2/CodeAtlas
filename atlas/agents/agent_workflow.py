@@ -1,12 +1,18 @@
 import logging
+import openai
+import instructor
 
 from typing import Union
 
-from atomic_agents.agents.base_agent import BaseAgent
+from atomic_agents.agents.base_agent import BaseAgent, BaseAgentConfig
+from atomic_agents.lib.components.system_prompt_generator import SystemPromptGenerator
 
 from atlas.agents.orchestrator_agent import ReasoningInputSchema, AgentDecisionSchema
-from atlas.agents.relational_db_tool import RelationalDBToolOutputSchema, RelationalDBTool, RelationalDBToolInputSchema
-from atlas.agents.vector_db_tool import VectorDBTool, VectorDBToolInputSchema, VectorDBToolOutputSchema
+from atlas.agents.relational_db_tool import RelationalDBToolOutputSchema, RelationalDBTool, RelationalDBToolInputSchema, \
+    RelationalDBToolConfig
+from atlas.agents.vector_db_tool import VectorDBTool, VectorDBToolInputSchema, VectorDBToolOutputSchema, \
+    VectorDBToolConfig
+from atlas.config import QDRANT_COLLECTION, EMBED_MODEL
 
 MAX_ITERATIONS = 5
 logger = logging.getLogger(__name__)
@@ -177,9 +183,58 @@ def run_agent_workflow(user_query: str, main_agent: BaseAgent, vector_db_tool: V
         return fallback_message
 
 
-if __name__ == "__main__":
-    # --- TODO: Initialize components ---
-    # ... (client, tools, agent setup)
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS chunks (
+    id INTEGER PRIMARY KEY,
+    chunk_id TEXT UNIQUE,
+    chunk_type TEXT,
+    name TEXT,
+    chunk_no INTEGER,
+    start_line INTEGER,
+    end_line INTEGER,
+    file_path TEXT,
+    source TEXT,
+    created_at TEXT
+);
+"""
 
-    test_query = "What are the possible values for chunk_type?"
-    # final_result = run_agent_workflow(test_query, main_agent, vdb_tool, rdb_tool)
+
+def run(query: str, sqlite_client, qdrant_client):
+    orchestrator_agent = BaseAgent(
+        BaseAgentConfig(
+            client=instructor.from_openai(openai.OpenAI()),
+            model="gpt-4o-mini",
+            system_prompt_generator=SystemPromptGenerator(
+                background=[
+                    "You will receive a query and context, and your goal is to answer the query."
+                ],
+                steps=[
+                    "First reason and then choose an action.",
+                    "If you can answer, choose final_answer and provide the final_answer.",
+                    "If you need more info, choose call_vector_db or call_relational_db and provide the necessary "
+                    "tool_parameters.",
+                    "Use the provided context and potentially ask for specific tool calls to get missing information.",
+                    "When you use call_relational_db create a query valid for this schema " + SCHEMA
+                ],
+            ),
+            input_schema=ReasoningInputSchema,
+            output_schema=AgentDecisionSchema,
+        )
+    )
+
+    vector_tool_cfg = VectorDBToolConfig(
+        qdrant_client=qdrant_client,
+        collection_name=QDRANT_COLLECTION,
+        embedding_model=EMBED_MODEL
+    )
+
+    db_tool_cfg = RelationalDBToolConfig(
+        conn=sqlite_client
+    )
+
+    vector_db_tool = VectorDBTool(vector_tool_cfg)
+    relational_db_tool = RelationalDBTool(db_tool_cfg)
+
+    final_result = run_agent_workflow(query, orchestrator_agent, vector_db_tool, relational_db_tool)
+    return final_result
+

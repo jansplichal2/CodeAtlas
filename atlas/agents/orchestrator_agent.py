@@ -1,5 +1,4 @@
-import openai
-import instructor
+
 import logging
 
 from typing import Union, Optional, Literal
@@ -16,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class ReasoningInputSchema(BaseIOSchema):
+    """Input schema for the Orchestrator Agent. Contains original user query, context and iteration number."""
     original_query: str = Field(..., description="The user's original text query.")
     context: str = Field(..., description="Context retrieved from knowledge sources (e.g., initial vector search, "
                                           "previous tool outputs).")
@@ -23,6 +23,7 @@ class ReasoningInputSchema(BaseIOSchema):
 
 
 class AgentDecisionSchema(BaseIOSchema):
+    """Combined output schema for the Orchestrator Agent. Contains the tool to use and its parameters."""
     thought: str = Field(
         ...,
         description="Your step-by-step reasoning based on the query and context to decide the next action."
@@ -45,42 +46,5 @@ class OrchestratorAgentConfig(BaseAgentConfig):
     vector_db_config: VectorDBToolConfig
     relational_db_config: RelationalDBToolConfig
 
-
-SCHEMA = """
-CREATE TABLE IF NOT EXISTS chunks (
-    id INTEGER PRIMARY KEY,
-    chunk_id TEXT UNIQUE,
-    chunk_type TEXT,
-    name TEXT,
-    chunk_no INTEGER,
-    start_line INTEGER,
-    end_line INTEGER,
-    file_path TEXT,
-    source TEXT,
-    created_at TEXT
-);
-"""
-
-orchestrator_agent = BaseAgent(
-    BaseAgentConfig(
-        client=instructor.from_openai(openai.OpenAI()),
-        model="gpt-4o-mini",
-        system_prompt_generator=SystemPromptGenerator(
-            background=[
-                "You will receive a query and context, and your goal is to answer the query."
-            ],
-            steps=[
-                "First reason and then choose an action.",
-                "If you can answer, choose final_answer and provide the final_answer.",
-                "If you need more info, choose call_vector_db or call_relational_db and provide the necessary "
-                "tool_parameters.",
-                "Use the provided context and potentially ask for specific tool calls to get missing information.",
-                "When you use call_relational_db create a query valid for this schema " + SCHEMA
-            ],
-        ),
-        input_schema=ReasoningInputSchema,
-        output_schema=AgentDecisionSchema,
-    )
-)
 
 
