@@ -8,6 +8,9 @@ class Embedding:
         self.embedding = []
         self.errors = []
 
+    def __str__(self):
+        return f'{self.chunk_id} {self.chunk_text}'
+
 
 class BaseEmbedder:
     def __init__(self, model_type):

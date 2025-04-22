@@ -20,7 +20,7 @@ class OpenAIEmbedder(BaseEmbedder):
         for attempt in range(max_retries):
             try:
                 response = openai.embeddings.create(
-                    input=[embed.chunk_text for embed in chunks],
+                    input=[str(embed.chunk_text) for embed in chunks],
                     model=self.model_type
                 )
                 embeddings = [res.embedding for res in response.data]
@@ -35,8 +35,6 @@ class OpenAIEmbedder(BaseEmbedder):
                     delay *= 2
                 else:
                     for chunk in chunks:
-                        if 'errors' not in chunk:
-                            chunk.errors = []
                         chunk.errors.append({'source': 'embedding', 'error': str(e)})
                     return chunks
         return []

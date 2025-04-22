@@ -32,8 +32,6 @@ class VoyageEmbedder(BaseEmbedder):
 
         except VoyageError as e:
             for chunk in chunks:
-                if 'errors' not in chunk:
-                    chunk.errors = []
                 chunk.errors.append({'source': 'embedding', 'error': str(e)})
             return chunks
 

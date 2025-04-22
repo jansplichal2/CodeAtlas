@@ -16,7 +16,7 @@ def save_embeddings(chunks_with_embedding):
             if len(chunk.errors) > 0:
                 if 'errors' not in data:
                     data['errors'] = []
-                data['errors'].append({'source': 'embedding', 'error': '\n'.join(chunk.errors)})
+                data['errors'].append({'source': 'embedding', 'error': json.dumps(chunk.errors)})
                 with open(chunk_file, "r+", encoding="utf-8") as w:
                     json.dump(data, w, indent=2)
             else:
