@@ -187,7 +187,7 @@ SQLITE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS chunks (
     id INTEGER PRIMARY KEY,
     chunk_id TEXT UNIQUE,
-    chunk_type TEXT, -- class, function, sql_statement or unknown
+    chunk_type TEXT, -- class, function, sql_statement, jsp or unknown
     name TEXT, -- name of class or function
     chunk_no INTEGER, -- if the class/function needs to be split into many parts, this is the part no
     start_line INTEGER, -- start line in the source
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS chunks (
 
 QDRANT_SCHEMA = """
 {
-    "type": "function",  # class, function, sql_statement or unknown
+    "type": "function",  # class, function, sql_statement, jsp or unknown
     "name": "getTarget", # name of class or function   
     "chunk_no": 1,       # if the class/function needs to be split into many parts, this is the part no
     "start_line": 10,    # start line in the source

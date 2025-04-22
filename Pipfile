@@ -16,6 +16,7 @@ tree-sitter = "*"
 tree-sitter-java = "*"
 pydantic = "~=2.11.3"
 instructor = "~=1.7.9"
+voyageai = ">=0.2.4"
 
 [dev-packages]
 

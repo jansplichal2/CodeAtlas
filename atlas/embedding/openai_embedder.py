@@ -16,7 +16,7 @@ class OpenAIEmbedder(BaseEmbedder):
     def retrieve_embedding(self, chunks: List[Embedding]) -> List[Embedding]:
         max_retries = 3
         delay = 1
-
+        time.sleep(0.05) # for rate limiting, should be improved
         for attempt in range(max_retries):
             try:
                 response = openai.embeddings.create(
@@ -36,8 +36,8 @@ class OpenAIEmbedder(BaseEmbedder):
                 else:
                     for chunk in chunks:
                         if 'errors' not in chunk:
-                            chunk['errors'] = []
-                        chunk['errors'].append({'source': 'embedding', 'error': str(e)})
+                            chunk.errors = []
+                        chunk.errors.append({'source': 'embedding', 'error': str(e)})
                     return chunks
         return []
 
