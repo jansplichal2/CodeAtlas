@@ -5,6 +5,8 @@ from typing import List
 from pprint import pprint
 from pathlib import Path
 
+from atlas.lining.line_extractor import save_lines_to_file
+from atlas.lining.line_extractor_dispatcher import get_line_extractor
 from atlas.qdrant.loader import client as qdrant_client
 
 from atlas.agents.agent_workflow import run
@@ -25,6 +27,61 @@ app = typer.Typer()
 test_app = typer.Typer()
 app.add_typer(test_app, name="test")
 
+
+def validate_and_normalize(root: Path, project_root: str):
+    base_path = Path(root).resolve()
+    if not base_path.exists():
+        typer.echo(f"❌ Path does not exist: {base_path}")
+        raise typer.Exit(code=1)
+
+    project_root_path = Path(project_root).resolve()
+    if not project_root_path.exists():
+        typer.echo(f"❌ Project root not exist: {project_root_path}")
+        raise typer.Exit(code=1)
+    return base_path, project_root_path
+
+@app.command("extract-lines")
+def extract_lines(
+        root: Path = typer.Argument(..., exists=True, file_okay=False, resolve_path=True),
+        include_ext: List[str] = typer.Option(
+            ...,
+            "--ext",
+            "-e",
+            help="File extension(s) to include. Repeat the flag for multiple.",
+            show_default=False,
+        ),
+        exclude_dir: List[str] = typer.Option(
+            None,
+            "--exclude-dir",
+            "-x",
+            help="Directory name(s) to skip. Repeat for multiple.",
+        ),
+        project_root: str = typer.Option(
+            "/",
+            "--project-root",
+            "-p",
+            help="Root of the project directory.",
+        ),
+):
+    base_path, project_root_path = validate_and_normalize(root, project_root)
+
+    typer.echo(f"🔍 Scanning and extracting lines for embedding: {base_path}")
+    counter = 0
+
+    for file_path in iter_files(root, include_ext, exclude_dir):
+        if file_path.is_file():
+            try:
+                line_extractor = get_line_extractor(file_path, project_root_path)
+                lines = line_extractor.extract_lines_from_file(file_path)
+                save_lines_to_file(lines)
+                counter += 1
+            except Exception as e:
+                import traceback
+                typer.echo(f"⚠️ Skipped {file_path.name}: {e}")
+                raise ValueError(f"Java parse error:\n{traceback.format_exc()}")
+
+
+    typer.echo(f"💾 Saved {counter} files to .lines/")
 
 @app.command()
 def chunk(
@@ -49,15 +106,7 @@ def chunk(
             help="Root of the project directory.",
         ),
 ):
-    base_path = Path(root).resolve()
-    if not base_path.exists():
-        typer.echo(f"❌ Path does not exist: {base_path}")
-        raise typer.Exit(code=1)
-
-    project_root_path = Path(project_root).resolve()
-    if not project_root_path.exists():
-        typer.echo(f"❌ Project root not exist: {project_root_path}")
-        raise typer.Exit(code=1)
+    base_path, project_root_path = validate_and_normalize(root, project_root)
 
     typer.echo(f"🔍 Scanning and chunking for embedding: {base_path}")
     all_chunks = []

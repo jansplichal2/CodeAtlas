@@ -6,6 +6,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 PROJECT_ROOT = Path(".").resolve()
 CHUNK_DIR = PROJECT_ROOT / ".chunks"
+LINES_DIR = PROJECT_ROOT / ".lines"
 DB_PATH = PROJECT_ROOT / ".codeatlas.sqlite"
 MAX_TOKENS = 8192
 MAX_CHUNK_LINES = 80
