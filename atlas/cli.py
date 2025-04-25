@@ -15,6 +15,7 @@ from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanu
 from atlas.config import EMBED_PROVIDER, EMBED_MODEL, QDRANT_PATH
 from atlas.embedding.embedder import embed_chunks
 from atlas.embedding.embedding_dispatcher import get_embedder
+from atlas.sqlite.line_loader import load_lines_to_sqlite
 from atlas.sqlite.loader import load_chunks_to_sqlite, test_sql_query, connect_db
 from atlas.qdrant.loader import load_chunks_to_qdrant, test_qdrant_query
 from atlas.utils import iter_files
@@ -142,6 +143,12 @@ def errors():
 def load_sqlite():
     typer.echo("📥 Loading chunk metadata into SQLite...")
     load_chunks_to_sqlite()
+
+
+@app.command("load-sqlite-lines")
+def load_sqlite_lines():
+    typer.echo("📥 Loading line metadata into SQLite...")
+    load_lines_to_sqlite()
 
 
 @app.command()

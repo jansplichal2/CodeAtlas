@@ -14,10 +14,10 @@ class Line:
     def as_json(self) -> Dict[str, Optional[Any]]:  # noqa: D401 – simple name
         return {
             "line_id": self.line_id,
-            "parent-type": self.clazz,
-            "parent-method": self.method,
+            "parent_type": self.clazz,
+            "parent_method": self.method,
             "source": self.source,
-            "file_name": self.file_name,
+            "file_path": self.file_name,
             "file_line_no": self.file_line_no,
         }
 
