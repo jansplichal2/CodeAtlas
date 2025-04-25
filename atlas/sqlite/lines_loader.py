@@ -82,4 +82,4 @@ def load_lines_to_sqlite():
                     errors += 1
                     logger.error(error)
 
-    logger.info(f"Inserted {count} lines into SQLite. {errors} files finished with error")
+    logger.info(f"Inserted {count} files into SQLite. {errors} files finished with error")
