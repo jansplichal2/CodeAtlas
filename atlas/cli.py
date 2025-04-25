@@ -7,7 +7,7 @@ from pathlib import Path
 
 from atlas.lining.line_extractor import save_lines_to_file
 from atlas.lining.line_extractor_dispatcher import get_line_extractor
-from atlas.qdrant.loader import client as qdrant_client
+from atlas.qdrant.chunks_loader import client as qdrant_client
 
 from atlas.agents.agent_workflow import run
 from atlas.chunking.chunk_dispatcher import get_chunker
@@ -17,7 +17,7 @@ from atlas.embedding.embedder import embed_chunks
 from atlas.embedding.embedding_dispatcher import get_embedder
 from atlas.sqlite.lines_loader import load_lines_to_sqlite
 from atlas.sqlite.chunks_loader import load_chunks_to_sqlite, test_sql_query, connect_db
-from atlas.qdrant.loader import load_chunks_to_qdrant, test_qdrant_query
+from atlas.qdrant.chunks_loader import load_chunks_to_qdrant, test_qdrant_query
 from atlas.utils import iter_files
 
 logging.basicConfig(
