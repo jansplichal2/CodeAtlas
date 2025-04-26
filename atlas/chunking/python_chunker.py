@@ -30,7 +30,7 @@ class PythonChunker(BaseChunker):
                     chunk_no=1,
                     start_line=docstring_node.lineno,
                     end_line=docstring_node.end_lineno,
-                    source="\\n".join(lines[docstring_node.lineno - 1:docstring_node.end_lineno]),
+                    source="\n".join(lines[docstring_node.lineno - 1:docstring_node.end_lineno]),
                     file_path=str(relative_file_path)
                 ))
 
@@ -42,7 +42,7 @@ class PythonChunker(BaseChunker):
                     if end - start + 1 > MAX_CHUNK_LINES:
                         chunks.extend(self._split_long_chunk(node, lines, relative_file_path))
                     else:
-                        chunk_source = "\\n".join(lines[start - 1:end])
+                        chunk_source = "\n".join(lines[start - 1:end])
                         chunks.append(CodeChunk(
                             chunk_type=self.resolve_type(type(node).__name__.lower()),
                             name=node.name,
@@ -91,7 +91,7 @@ class PythonChunker(BaseChunker):
                     chunk_no=count,
                     start_line=sub_start_line,
                     end_line=sub_end_line,
-                    source="\\n".join(buffer),
+                    source="\n".join(buffer),
                     file_path=str(relative_file_path)
                 ))
                 sub_start_line = sub_end_line + 1
@@ -105,7 +105,7 @@ class PythonChunker(BaseChunker):
                 chunk_no=count,
                 start_line=sub_start_line,
                 end_line=sub_end_line,
-                source="\\n".join(buffer),
+                source="\n".join(buffer),
                 file_path=str(relative_file_path)
             ))
 

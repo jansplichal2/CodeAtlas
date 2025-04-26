@@ -62,7 +62,7 @@ class JavaChunker(BaseChunker):
                         chunk_no=count,
                         start_line=sub_start_line,
                         end_line=sub_end_line,
-                        source="\\n".join(buffer),
+                        source="\n".join(buffer),
                         file_path=str(relative_file_path)
                     ))
                     sub_start_line = sub_end_line + 1
@@ -76,7 +76,7 @@ class JavaChunker(BaseChunker):
                     chunk_no=count,
                     start_line=sub_start_line,
                     end_line=sub_end_line,
-                    source="\\n".join(buffer),
+                    source="\n".join(buffer),
                     file_path=str(relative_file_path)
                 ))
             return subchunks
@@ -106,7 +106,7 @@ class JavaChunker(BaseChunker):
                         chunk_no=1,
                         start_line=start.row + 1,
                         end_line=end.row + 1,
-                        source="\\n".join(source_lines),
+                        source="\n".join(source_lines),
                         file_path=str(relative_file_path)
                     ))
 

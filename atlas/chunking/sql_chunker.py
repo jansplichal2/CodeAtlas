@@ -68,7 +68,7 @@ class SQLChunker(BaseChunker):
                     chunk_no=count,
                     start_line=sub_start_line,
                     end_line=sub_end_line,
-                    source="\\n".join(buffer),
+                    source="\n".join(buffer),
                     file_path=str(relative_file_path)
                 ))
                 sub_start_line = sub_end_line + 1
@@ -84,7 +84,7 @@ class SQLChunker(BaseChunker):
                 chunk_no=count,
                 start_line=sub_start_line,
                 end_line=sub_end_line,
-                source="\\n".join(buffer),
+                source="\n".join(buffer),
                 file_path=str(relative_file_path)
             ))
 
