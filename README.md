@@ -4,6 +4,32 @@
 It uses language-aware chunking, token-safe validation, vector embeddings, and metadata tracking to support deep code understanding at scale.
 
 ---
+## ⚙️ Architecture
+
+
+
+```mermaid
+flowchart TD
+    Start([Start]) --> InitialContext
+    InitialContext[Get Initial Context] --> VectorDBTool1
+    VectorDBTool1[VectorDBTool] --> LLMDecision
+
+    LLMDecision{LLM Decision} --> |Use VectorDBTool| VectorDBTool2[VectorDBTool]
+    LLMDecision --> |Use RelationalDBTool| RelationalDBTool[RelationalDBTool]
+    LLMDecision --> |Use GraphDBTool| GraphDBTool[GraphDBTool]
+    LLMDecision --> |Satisfied with Answer| Complete
+    
+    VectorDBTool2 --> CheckLimit
+    RelationalDBTool --> CheckLimit
+    GraphDBTool --> CheckLimit
+    
+    CheckLimit{Retry Limit\nReached?} --> |No| LLMDecision
+    CheckLimit --> |Yes| Complete
+
+    Complete([Complete])
+```
+
+---
 
 ## 🚀 Features
 
