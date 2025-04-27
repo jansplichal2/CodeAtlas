@@ -1,3 +1,4 @@
+import datetime
 import logging
 import openai
 import instructor
@@ -63,8 +64,8 @@ def run_agent_workflow(user_query: str, main_agent: BaseAgent, vector_db_tool: V
         The final answer string or an error/fallback message.
     """
     # Use current date for logging context, if desired
-    current_date_str = "2025-04-20"  # Replace with dynamic date if needed for logs
-    logger.info(f"[{current_date_str}] Starting workflow for query: '{user_query}'")
+    current_date = datetime.date.today()
+    logger.info(f"[{current_date}] Starting workflow for query: '{user_query}'")
 
     # 1. Initial Context Fetch
     try:
@@ -247,7 +248,7 @@ def run(query: str, sqlite_client, qdrant_client):
 
     vector_db_tool = VectorDBTool(vector_tool_cfg)
     relational_db_tool = RelationalDBTool(db_tool_cfg)
-
+    logger.info("Tools configured, running the main workflow...")
     final_result = run_agent_workflow(query, orchestrator_agent, vector_db_tool, relational_db_tool)
     return final_result
 

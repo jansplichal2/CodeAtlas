@@ -144,14 +144,14 @@ class JavaLineExtractor(BaseLineExtractor):
         extractor = JavaContextExtractor(src_bytes, src_lines)
         line_ctx = extractor.extract(tree.root_node)
 
-        file_name = file_path.name
+        relative_file_path = file_path.relative_to(self.project_root)
         result = []
         for i, (src_line, ctx) in enumerate(zip(src_lines, line_ctx)):
             result.append(
                 Line(
                     line_id=str(uuid.uuid4()),
                     source=src_line,
-                    file_name=file_name,
+                    file_name=str(relative_file_path),
                     file_line_no=i + 1,
                     clazz=ctx.clazz,
                     method=ctx.method,
