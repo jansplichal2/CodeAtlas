@@ -27,6 +27,7 @@ pip-delete-this-directory.txt
 
 # Where chunks are stored
 .chunks/
+.lines/
 .error_chunks/
 
 # Unit test / coverage reports
