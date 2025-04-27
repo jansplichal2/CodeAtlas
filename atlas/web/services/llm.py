@@ -1,6 +1,6 @@
 import logging
 
-from qdrant_client import qdrant_client
+from atlas.qdrant.chunks_loader import client as qdrant_client
 
 from atlas.agents.agent_workflow import run
 from atlas.sqlite.utils import get_db_connection
