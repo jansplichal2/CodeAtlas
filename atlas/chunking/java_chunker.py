@@ -56,29 +56,33 @@ class JavaChunker(BaseChunker):
                 if is_split_point:
                     sub_end_line = sub_start_line + len(buffer) - 1
                     count += 1
+                    source = "\n".join(buffer)
+                    if len(str.strip(source)) != 0:
+                        subchunks.append(CodeChunk(
+                            chunk_type=chunk_type,
+                            name=name,
+                            chunk_no=count,
+                            start_line=sub_start_line,
+                            end_line=sub_end_line,
+                            source=source,
+                            file_path=str(relative_file_path)
+                        ))
+                    sub_start_line = sub_end_line + 1
+                    buffer = []
+            if buffer:
+                sub_end_line = sub_start_line + len(buffer) - 1
+                count += 1
+                source = "\n".join(buffer)
+                if len(str.strip(source)) != 0:
                     subchunks.append(CodeChunk(
                         chunk_type=chunk_type,
                         name=name,
                         chunk_no=count,
                         start_line=sub_start_line,
                         end_line=sub_end_line,
-                        source="\n".join(buffer),
+                        source=source,
                         file_path=str(relative_file_path)
                     ))
-                    sub_start_line = sub_end_line + 1
-                    buffer = []
-            if buffer:
-                sub_end_line = sub_start_line + len(buffer) - 1
-                count += 1
-                subchunks.append(CodeChunk(
-                    chunk_type=chunk_type,
-                    name=name,
-                    chunk_no=count,
-                    start_line=sub_start_line,
-                    end_line=sub_end_line,
-                    source="\n".join(buffer),
-                    file_path=str(relative_file_path)
-                ))
             return subchunks
 
         def resolve_type(original_type):
@@ -100,15 +104,17 @@ class JavaChunker(BaseChunker):
                 if len(source_lines) > MAX_CHUNK_LINES:
                     chunks.extend(split_long_chunk(source_lines, chunk_type, name, start.row + 1))
                 else:
-                    chunks.append(CodeChunk(
-                        chunk_type=chunk_type,
-                        name=name,
-                        chunk_no=1,
-                        start_line=start.row + 1,
-                        end_line=end.row + 1,
-                        source="\n".join(source_lines),
-                        file_path=str(relative_file_path)
-                    ))
+                    source = "\n".join(source_lines)
+                    if len(str.strip(source)) != 0:
+                        chunks.append(CodeChunk(
+                            chunk_type=chunk_type,
+                            name=name,
+                            chunk_no=1,
+                            start_line=start.row + 1,
+                            end_line=end.row + 1,
+                            source=source,
+                            file_path=str(relative_file_path)
+                        ))
 
         walk_tree(root_node.walk(), collect_node)
         return chunks

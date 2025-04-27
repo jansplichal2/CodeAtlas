@@ -22,7 +22,7 @@ from atlas.qdrant.chunks_loader import load_chunks_to_qdrant, test_qdrant_query
 from atlas.utils import iter_files
 
 logging.basicConfig(
-    level=logging.DEBUG
+    level=logging.INFO
 )
 
 app = typer.Typer()
