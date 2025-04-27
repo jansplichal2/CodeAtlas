@@ -1,39 +1,13 @@
 import json
 import logging
-import sqlite3
+
 from typing import Dict, Tuple, Any
 from datetime import datetime
-from atlas.config import CHUNK_DIR, DB_PATH
+
+from atlas.config import CHUNK_DIR
+from atlas.sqlite.utils import get_db_connection
 
 logger = logging.getLogger(__name__)
-
-SCHEMA = """
-CREATE TABLE IF NOT EXISTS chunks (
-    id INTEGER PRIMARY KEY,
-    chunk_id TEXT UNIQUE,
-    chunk_type TEXT,
-    name TEXT,
-    chunk_no INTEGER,
-    start_line INTEGER,
-    end_line INTEGER,
-    file_path TEXT,
-    source TEXT,
-    tokens INTEGER,
-    created_at TEXT
-);
-"""
-
-
-def connect_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
-    return conn
-
-
-def init_db():
-    with connect_db() as conn:
-        conn.executescript(SCHEMA)
 
 
 def insert_chunk_record(conn: Any, chunk: Dict) -> Tuple[bool, str]:
@@ -75,21 +49,10 @@ def insert_chunk_record(conn: Any, chunk: Dict) -> Tuple[bool, str]:
     except Exception as e:
         return True, str(e)
 
-
-def test_sql_query(query: str):
-    with connect_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        logger.info(f"{len(rows)} rows returned")
-        return rows
-
-
 def load_chunks_to_sqlite():
-    init_db()
     count = 0
     errors = 0
-    with connect_db() as conn:
+    with get_db_connection() as conn:
         for chunk_file in CHUNK_DIR.glob("*.json"):
             with open(chunk_file, "r", encoding="utf-8") as f:
                 data = json.load(f)

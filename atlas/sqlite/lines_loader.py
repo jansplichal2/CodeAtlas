@@ -1,39 +1,13 @@
 import json
 import logging
-import sqlite3
 
 from datetime import datetime, timezone
 from typing import Dict, Tuple, Any, List
 
-from atlas.config import LINES_DIR, DB_PATH
+from atlas.config import LINES_DIR
+from atlas.sqlite.utils import get_db_connection
 
 logger = logging.getLogger(__name__)
-
-
-SCHEMA = """
-CREATE TABLE IF NOT EXISTS lines (
-    id INTEGER PRIMARY KEY,
-    line_id TEXT UNIQUE,
-    parent_type TEXT,
-    parent_method TEXT,
-    file_line_no INTEGER,
-    file_path TEXT,
-    source TEXT,
-    created_at TEXT
-);
-"""
-
-
-def connect_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
-    return conn
-
-
-def init_db():
-    with connect_db() as conn:
-        conn.executescript(SCHEMA)
 
 
 def insert_line_record(conn: Any, lines: List[Dict]) -> Tuple[bool, str]:
@@ -69,10 +43,9 @@ def insert_line_record(conn: Any, lines: List[Dict]) -> Tuple[bool, str]:
 
 
 def load_lines_to_sqlite():
-    init_db()
     count = 0
     errors = 0
-    with connect_db() as conn:
+    with get_db_connection() as conn:
         for line_file in LINES_DIR.glob("*.json"):
             with open(line_file, "r", encoding="utf-8") as f:
                 data = json.load(f)

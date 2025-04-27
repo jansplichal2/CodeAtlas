@@ -1,2 +1,4 @@
+from atlas.sqlite.utils import execute_sql_query
+
 def handle(query: str):
-    return {"rows": [{"id": 1, "name": "Relational DB"}]}
+    return execute_sql_query(query)

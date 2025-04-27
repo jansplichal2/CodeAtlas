@@ -16,7 +16,8 @@ from atlas.config import EMBED_PROVIDER, EMBED_MODEL, QDRANT_PATH
 from atlas.embedding.embedder import embed_chunks
 from atlas.embedding.embedding_dispatcher import get_embedder
 from atlas.sqlite.lines_loader import load_lines_to_sqlite
-from atlas.sqlite.chunks_loader import load_chunks_to_sqlite, test_sql_query, connect_db
+from atlas.sqlite.chunks_loader import load_chunks_to_sqlite
+from atlas.sqlite.utils import get_db_connection, execute_sql_query
 from atlas.qdrant.chunks_loader import load_chunks_to_qdrant, test_qdrant_query
 from atlas.utils import iter_files
 
@@ -172,7 +173,7 @@ def cleanup():
 @test_app.command("sqlite")
 def test_sqlite(query: str):
     typer.echo(f"Running SQL query {query}...")
-    rows = test_sql_query(query)
+    rows = execute_sql_query(query)
     for row in rows:
         pprint(dict(row))
 
@@ -189,7 +190,7 @@ def test_qdrant(query: str):
 
 @test_app.command("agent")
 def test_agent(query: str):
-    with connect_db() as sqlite:
+    with get_db_connection() as sqlite:
         result = run(query, sqlite, qdrant_client)
         pprint(result)
 
