@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -6,6 +8,9 @@ from starlette.responses import HTMLResponse
 
 from .api.v1.query import router as query_router
 
+logging.basicConfig(
+    level=logging.INFO
+)
 app = FastAPI(
     title="CodeAtlas+Dev API",
     description="Developer API for querying relational, vector, graph databases, and LLMs.",

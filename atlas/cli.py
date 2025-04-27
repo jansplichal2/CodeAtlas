@@ -18,7 +18,7 @@ from atlas.embedding.embedding_dispatcher import get_embedder
 from atlas.sqlite.lines_loader import load_lines_to_sqlite
 from atlas.sqlite.chunks_loader import load_chunks_to_sqlite
 from atlas.sqlite.utils import get_db_connection, execute_sql_query
-from atlas.qdrant.chunks_loader import load_chunks_to_qdrant, test_qdrant_query
+from atlas.qdrant.chunks_loader import load_chunks_to_qdrant, execute_qdrant_query
 from atlas.utils import iter_files
 
 logging.basicConfig(
@@ -183,7 +183,7 @@ def test_qdrant(query: str):
     typer.echo(f"Running semantic query {query}...")
     embedder = get_embedder(EMBED_PROVIDER, EMBED_MODEL)
     embedding = embedder.retrieve_embedding_for_query(query)
-    rows = test_qdrant_query(embedding, 10)
+    rows = execute_qdrant_query(embedding, 10)
     for row in rows:
         pprint(dict(row))
 

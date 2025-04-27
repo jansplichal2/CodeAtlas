@@ -1,2 +1,8 @@
+import logging
+from atlas.joern.client import run_command
+
+logger = logging.getLogger(__name__)
+
 def handle(query: str):
-    return {"rows": [{"id": 1, "name": "Graph DB"}]}
+    logger.info(f"Running joern query '{query}'")
+    return run_command(query)

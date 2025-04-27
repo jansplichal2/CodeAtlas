@@ -44,7 +44,7 @@ def load_chunks_to_qdrant():
     logger.info(f"Indexed {len(records)} chunks into Qdrant.")
 
 
-def test_qdrant_query(embedding: List[float], limit: int):
+def execute_qdrant_query(embedding: List[float], limit: int):
     result = client.query_points(
         collection_name=QDRANT_COLLECTION,
         query=embedding,

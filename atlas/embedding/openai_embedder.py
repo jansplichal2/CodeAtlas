@@ -14,7 +14,7 @@ class OpenAIEmbedder(BaseEmbedder):
         super().__init__(model_type)
 
     def retrieve_embedding(self, chunks: List[Embedding]) -> List[Embedding]:
-        max_retries = 2
+        max_retries = 3
         delay = 1
         time.sleep(0.05) # for rate limiting, should be improved
         for attempt in range(max_retries):

@@ -17,3 +17,5 @@ EMBED_MODEL = "text-embedding-3-small"
 QDRANT_COLLECTION = "codeatlas_chunks"
 QDRANT_DIM = 1536  # For text-embedding-3-small
 QDRANT_PATH = PROJECT_ROOT / ".codeatlas.qdrant"
+
+JOERN_SERVER_URL = "http://localhost:8080/query-sync"
