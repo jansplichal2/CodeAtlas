@@ -26,19 +26,20 @@ def load_chunks_to_qdrant():
     for chunk_file in CHUNK_DIR.glob("*.json"):
         with open(chunk_file, "r", encoding="utf-8") as f:
             data = json.load(f)
-        records.append(PointStruct(
-            id=data['chunk_id'],
-            vector=np.array(data['embedding'], dtype=np.float32).tolist(),
-            payload={
-                "type": data['type'],
-                "name": data['name'],
-                "chunk_no": data['chunk_no'],
-                "start_line": data['start_line'],
-                "end_line": data['end_line'],
-                "file_path": data['file_path'],
-                "source": data['source'],
-            }
-        ))
+        if len(data.get('errors', [])) == 0:
+            records.append(PointStruct(
+                id=data['chunk_id'],
+                vector=np.array(data['embedding'], dtype=np.float32).tolist(),
+                payload={
+                    "type": data['type'],
+                    "name": data['name'],
+                    "chunk_no": data['chunk_no'],
+                    "start_line": data['start_line'],
+                    "end_line": data['end_line'],
+                    "file_path": data['file_path'],
+                    "source": data['source'],
+                }
+            ))
     client.upsert(collection_name=QDRANT_COLLECTION, points=records)
     logger.info(f"Indexed {len(records)} chunks into Qdrant.")
 
