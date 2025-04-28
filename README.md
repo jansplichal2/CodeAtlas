@@ -11,7 +11,7 @@ It uses language-aware chunking, token-safe validation, vector embeddings, and m
 ```mermaid
 flowchart TD
     Start([Start]) --> InitialContext
-    InitialContext[Get Initial Context] --> VectorDBTool1
+    InitialContext[Get Initial Context From User] --> VectorDBTool1
     VectorDBTool1[VectorDBTool] --> LLMDecision
 
     LLMDecision{LLM Decision} --> |Use VectorDBTool| VectorDBTool2[VectorDBTool]
