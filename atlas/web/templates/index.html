@@ -1,45 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CodeAtlas Dev UI</title>
-  <link rel="stylesheet" href="/static/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeAtlas Dev UI</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-  <h1>CodeAtlas++ Dev UI</h1>
+<h1>CodeAtlas Dev UI</h1>
 
-  <label for="serviceSelect">Select Service:</label>
-  <select id="serviceSelect">
-    <option value="relational">Relational DB</option>
-    <option value="vector">Vector DB</option>
-    <option value="graph">Graph DB</option>
-    <option value="llm">LLM</option>
-  </select>
+<label for="serviceSelect">Select Service:</label>
+<div style="width: 490px">
+    <select style="width: 100%" id="serviceSelect">
+        <option value="relational">Relational DB</option>
+        <option value="vector">Vector DB</option>
+        <option value="graph">Graph DB</option>
+        <option value="llm">LLM</option>
+    </select>
+</div>
 
-  <div id="llmOptions" style="display: none;">
+<div id="llmOptions" style="display: none;">
     <label for="llmProviderSelect">LLM Provider:</label>
     <select id="llmProviderSelect">
-      <option value="openai">OpenAI</option>
-      <option value="anthropic">Anthropic</option>
+        <option value="openai">OpenAI</option>
+        <option value="anthropic">Anthropic</option>
     </select>
 
     <label for="llmModelSelect">LLM Model:</label>
     <select id="llmModelSelect">
-      <!-- dynamically populated -->
+        <!-- dynamically populated -->
     </select>
-  </div>
+</div>
 
-  <label for="queryInput">Enter Query:</label>
-  <textarea id="queryInput" placeholder="Type your query here..."></textarea>
+<label for="queryInput">Enter Query:</label>
+<textarea id="queryInput" placeholder="Type your query here..."></textarea>
 
-  <button id="submitQuery">Submit Query</button>
+<button id="submitQuery">Submit Query</button>
 
-  <button class="doc-toggle" onclick="toggleDocs()">Show/Hide Documentation</button>
-  <div id="documentation" style="display: none"></div>
+<button class="doc-toggle" onclick="toggleDocs()">Show/Hide Documentation</button>
+<div id="documentation" style="display: none"></div>
 
-  <div id="responseArea" class="response"></div>
+<div id="responseArea" class="response"></div>
 
-  <script src="/static/scripts.js"></script>
+<script src="/static/scripts.js"></script>
 </body>
 </html>

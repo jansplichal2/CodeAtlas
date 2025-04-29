@@ -3,6 +3,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from atlas.web.models.query_request import QueryRequest
 from atlas.web.services import relational, vector, graph, llm
+from atlas.web.services.utils import ServiceException
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -30,7 +31,12 @@ async def handle_query(request: QueryRequest):
             "service": service,
             "result": result
         }
-
+    except ServiceException as e:
+        return {
+            "status": "failure",
+            "service": service,
+            "result": f"{request.query}: {str(e)}"
+        }
     except HTTPException as e:
         raise e
     except Exception as e:
