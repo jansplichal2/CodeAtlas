@@ -69,11 +69,13 @@ submitButton.addEventListener('click', async () => {
             body: JSON.stringify(payload)
         });
 
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+        if (!response.ok) {
+            responseArea.textContent = `Request failed: ${response.status}`
+        }
         const data = await response.json();
 
         if (data.service === "relational") {
-            renderRelationalResult(data.result);
+            renderRelationalResult(data);
         } else {
             responseArea.textContent = JSON.stringify(data, null, 2);
         }
@@ -83,8 +85,15 @@ submitButton.addEventListener('click', async () => {
     }
 });
 
-const renderRelationalResult = result => {
+const renderRelationalResult = data => {
     responseArea.innerHTML = '';  // Clear previous
+
+    if (data.status === 'failure') {
+       responseArea.textContent = data.result;
+       return;
+    }
+
+    const result = data.result;
 
     if (!Array.isArray(result) || result.length === 0) {
         responseArea.textContent = "No results.";
