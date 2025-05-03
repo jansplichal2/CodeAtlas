@@ -1,10 +1,16 @@
+// Selection of services
 const serviceSelect = document.getElementById('serviceSelect');
 const llmOptions = document.getElementById('llmOptions');
 const llmProviderSelect = document.getElementById('llmProviderSelect');
 const llmModelSelect = document.getElementById('llmModelSelect');
+
+// Documentation for different types of services
 const documentation = document.getElementById('documentation');
-const responseArea = document.getElementById('responseArea');
+
+// Handling of queries
+const queryInput = document.getElementById('queryInput');
 const submitButton = document.getElementById('submitQuery');
+const responseArea = document.getElementById('responseArea');
 
 
 const llmModels = {
@@ -49,7 +55,7 @@ llmProviderSelect.addEventListener('change', () => {
 submitButton.addEventListener('click', async () => {
     const payload = {
         service: serviceSelect.value,
-        query: document.getElementById('queryInput').value,
+        query: queryInput.value,
     };
     if (payload.service === 'llm') {
         payload.llmProvider = llmProviderSelect.value;
