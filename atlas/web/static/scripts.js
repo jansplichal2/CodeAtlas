@@ -74,16 +74,18 @@ submitButton.addEventListener('click', async () => {
         }
         const data = await response.json();
 
-         if (data.status === 'failure') {
+        if (data.status === 'failure') {
             responseArea.textContent = data.result;
             return;
-         }
+        }
         const result = data.result;
 
         if (data.service === "relational") {
             renderRelationalResult(result);
         } else if (data.service === "vector") {
             renderVectorResult(result);
+        } else if (data.service === "graph") {
+            renderGraphResult(result);
         } else {
             responseArea.textContent = JSON.stringify(data, null, 2);
         }
@@ -210,6 +212,26 @@ function renderVectorResult(result) {
     });
 
     container.appendChild(table);
+}
+
+function renderGraphResult(result) {
+    const container = document.getElementById('responseArea');
+    container.innerHTML = '';  // Clear previous
+
+
+
+    const pre = document.createElement('pre');
+    pre.style.backgroundColor = '#1e1e1e';
+    pre.style.padding = '12px';
+    pre.style.borderRadius = '6px';
+    pre.style.whiteSpace = 'pre-wrap';
+    pre.style.overflowX = 'auto';
+    pre.style.fontFamily = 'monospace';
+    pre.style.color = '#c0c0c0';
+
+    pre.textContent = result;
+
+    container.appendChild(pre);
 }
 
 
