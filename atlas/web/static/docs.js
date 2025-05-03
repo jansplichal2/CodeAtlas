@@ -45,5 +45,67 @@ LIMIT 10;
 WHERE parent_method IS NULL
 ORDER BY file_path, file_line_no;
 </code></pre>
+`,
+
+  vector: `
+<h3>Vector DB</h3>
+
+<p>Vector DB allows semantic search based on meaning rather than exact keywords.</p>
+
+<p><strong>Input should be a natural language semantic query.</strong> Example:</p>
+
+<pre><code>Find code related to user authentication</code></pre>
+
+<p>Examples of useful queries:</p>
+
+<ul>
+<li>"Show me all lines related to password validation"</li>
+<li>"Code snippets that check user permissions"</li>
+<li>"Database connection handling"</li>
+</ul>
+
+<p>The system will return code chunks that semantically match the query.</p>
+`,
+
+  graph: `
+<h3>Graph DB (Joern)</h3>
+
+<p>Graph DB allows querying the source code as a graph (AST / CFG / etc).</p>
+
+<p><strong>Input should be a valid Joern query (using Joern query language).</strong></p>
+
+<p>Example queries:</p>
+
+<pre><code>cpg.call.code(".*password.*")</code></pre>
+
+<pre><code>cpg.method.name("getResource").ast.isCall</code></pre>
+
+<p>Examples of tasks:</p>
+
+<ul>
+<li>Find all method calls with \"password\" in the code</li>
+<li>Find methods calling other methods with specific names</li>
+<li>Trace dataflow for sensitive variables</li>
+</ul>
+
+<p>Refer to Joern documentation for advanced queries.</p>
+`,
+
+  llm: `
+<h3>LLM (Large Language Model)</h3>
+
+<p>LLM can be used for semantic queries that require natural language understanding.</p>
+
+<p><strong>Input should be a natural language query or prompt.</strong></p>
+
+<p>Examples:</p>
+
+<pre><code>Explain how user authentication is implemented in this codebase.</code></pre>
+
+<pre><code>Find code examples related to password encryption.</code></pre>
+
+<pre><code>List methods that handle sensitive data.</code></pre>
+
+<p>The LLM will interpret the query and return context-aware answers.</p>
 `
 };
