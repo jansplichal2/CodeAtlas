@@ -74,8 +74,16 @@ submitButton.addEventListener('click', async () => {
         }
         const data = await response.json();
 
+         if (data.status === 'failure') {
+            responseArea.textContent = data.result;
+            return;
+         }
+        const result = data.result;
+
         if (data.service === "relational") {
-            renderRelationalResult(data);
+            renderRelationalResult(result);
+        } else if (data.service === "vector") {
+            renderVectorResult(result);
         } else {
             responseArea.textContent = JSON.stringify(data, null, 2);
         }
@@ -85,15 +93,10 @@ submitButton.addEventListener('click', async () => {
     }
 });
 
-const renderRelationalResult = data => {
+const renderRelationalResult = result => {
     responseArea.innerHTML = '';  // Clear previous
 
-    if (data.status === 'failure') {
-       responseArea.textContent = data.result;
-       return;
-    }
 
-    const result = data.result;
 
     if (!Array.isArray(result) || result.length === 0) {
         responseArea.textContent = "No results.";
@@ -142,6 +145,75 @@ const renderRelationalResult = data => {
 
     responseArea.appendChild(table);
 }
+
+function renderVectorResult(result) {
+    const container = document.getElementById('responseArea');
+    container.innerHTML = '';  // Clear previous
+
+    if (!Array.isArray(result) || result.length === 0) {
+        container.textContent = "No results.";
+        return;
+    }
+
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '1rem';
+
+    // Create header
+    const headerRow = document.createElement('tr');
+    ['File Path', 'Chunk No', 'Lines', 'Type', 'Name', 'Source'].forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.borderBottom = '1px solid #444';
+        th.style.padding = '8px';
+        th.style.textAlign = 'left';
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    // Create rows
+    result.forEach(data => {
+        const row = document.createElement('tr');
+        const item = data.payload;
+        const filePath = item.file_path || '-';
+        const chunkNo = item.chunk_no !== undefined ? item.chunk_no : '-';
+        const lines = `${item.start_line ?? '-'} - ${item.end_line ?? '-'}`;
+        const type = item.type || '-';
+        const name = item.name || '-';
+        const source = item.source || '';
+
+        [filePath, chunkNo, lines, type, name].forEach(text => {
+            const td = document.createElement('td');
+            td.textContent = text;
+            td.style.padding = '6px 8px';
+            td.style.borderBottom = '1px solid #333';
+            row.appendChild(td);
+        });
+
+        const sourceTd = document.createElement('td');
+        const pre = document.createElement('pre');
+        pre.textContent = source;
+        pre.style.backgroundColor = '#1e1e1e';
+        pre.style.padding = '6px';
+        pre.style.borderRadius = '4px';
+        pre.style.whiteSpace = 'pre-wrap';
+        pre.style.overflowX = 'auto';
+        pre.style.margin = '0';
+        pre.style.fontFamily = 'monospace';
+
+        sourceTd.appendChild(pre);
+        sourceTd.style.verticalAlign = 'top';
+        sourceTd.style.padding = '6px 8px';
+        sourceTd.style.borderBottom = '1px solid #333';
+        row.appendChild(sourceTd);
+
+        table.appendChild(row);
+    });
+
+    container.appendChild(table);
+}
+
 
 // Initialize the first doc and LLM model list
 updateDocs();
