@@ -4,13 +4,8 @@ const llmProviderSelect = document.getElementById('llmProviderSelect');
 const llmModelSelect = document.getElementById('llmModelSelect');
 const documentation = document.getElementById('documentation');
 const responseArea = document.getElementById('responseArea');
+const submitButton = document.getElementById('submitQuery');
 
-// const docTexts = {
-//     relational: `**Relational DB**\n\nSchema:\n- Tables: Users, Projects, Commits\n- Example Query: SELECT * FROM Users WHERE id = 1;`,
-//     vector: `**Vector DB**\n\nEnter a semantic search query.\nExample: "Find code related to user authentication"`,
-//     graph: `**Graph DB**\n\nUsing Joern queries.\nExample: cpg.call.code(".*password.*")`,
-//     llm: `**LLM**\n\nEnter a prompt that will be processed by the selected LLM.`
-// };
 
 const llmModels = {
     openai: ['ChatGPT 4o', 'ChatGPT 4o-mini'],
@@ -20,6 +15,10 @@ const llmModels = {
 function updateDocs() {
     const selected = serviceSelect.value;
     documentation.innerHTML = docTexts[selected] || '';
+}
+
+function clearResults() {
+    responseArea.innerHTML = '';
 }
 
 function toggleDocs() {
@@ -33,6 +32,7 @@ serviceSelect.addEventListener('change', () => {
         llmOptions.style.display = 'none';
     }
     updateDocs();
+    clearResults();
 });
 
 llmProviderSelect.addEventListener('change', () => {
@@ -46,7 +46,7 @@ llmProviderSelect.addEventListener('change', () => {
     });
 });
 
-document.getElementById('submitQuery').addEventListener('click', async () => {
+submitButton.addEventListener('click', async () => {
     const payload = {
         service: serviceSelect.value,
         query: document.getElementById('queryInput').value,
@@ -77,16 +77,11 @@ document.getElementById('submitQuery').addEventListener('click', async () => {
     }
 });
 
-// Initialize the first doc and LLM model list
-updateDocs();
-llmProviderSelect.dispatchEvent(new Event('change'));
-
 const renderRelationalResult = result => {
-    const container = document.getElementById('responseArea');
-    container.innerHTML = '';  // Clear previous
+    responseArea.innerHTML = '';  // Clear previous
 
     if (!Array.isArray(result) || result.length === 0) {
-        container.textContent = "No results.";
+        responseArea.textContent = "No results.";
         return;
     }
 
@@ -130,5 +125,9 @@ const renderRelationalResult = result => {
         table.appendChild(row);
     });
 
-    container.appendChild(table);
+    responseArea.appendChild(table);
 }
+
+// Initialize the first doc and LLM model list
+updateDocs();
+llmProviderSelect.dispatchEvent(new Event('change'));
