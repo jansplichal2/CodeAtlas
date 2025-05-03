@@ -4,12 +4,9 @@ body {
     font-family: 'Inter', 'Roboto', sans-serif;
     margin: 0;
     padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
 }
 
-select, textarea, button {
+button, select, textarea {
     background-color: #1e1e1e;
     color: #e0e0e0;
     border: 1px solid #333;
@@ -18,15 +15,15 @@ select, textarea, button {
     font-size: 1rem;
 }
 
+button:hover {
+    background-color: #2c2c2c;
+    cursor: pointer;
+}
+
 textarea {
     width: 100%;
     height: 150px;
     resize: vertical;
-}
-
-button:hover {
-    background-color: #2c2c2c;
-    cursor: pointer;
 }
 
 #documentation {
@@ -37,18 +34,44 @@ button:hover {
     display: none;
 }
 
-.doc-toggle {
-    background: none;
-    border: none;
-    color: #76c7c0;
-    cursor: pointer;
-    margin-bottom: 0.5rem;
+#documentation pre, #responseArea pre {
+    background-color: #1e1e1e;
+    padding: 12px;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    font-family: monospace;
+    color: #c0c0c0;
 }
 
-.response {
-    background-color: #1b1b1b;
-    padding: 1rem;
-    border-radius: 8px;
-    white-space: pre-wrap;
+#documentation code, #responseArea code {
+    background-color: #2a2a2a;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+#responseArea table {
+    width: 100%;
+    border-collapse: collapse;
     margin-top: 1rem;
+}
+
+#responseArea th, #responseArea td {
+    border-bottom: 1px solid #333;
+    padding: 6px 8px;
+    text-align: left;
+}
+
+#responseArea tr:hover {
+    background-color: #1e1e1e;
+}
+
+#responseArea ul, #responseArea ol {
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+}
+
+#responseArea li {
+    margin-bottom: 0.25rem;
 }
