@@ -86,6 +86,8 @@ submitButton.addEventListener('click', async () => {
             renderVectorResult(result);
         } else if (data.service === "graph") {
             renderGraphResult(result);
+        } else if (data.service === "llm") {
+            renderLLMResult(result);
         } else {
             responseArea.textContent = JSON.stringify(data, null, 2);
         }
@@ -219,7 +221,6 @@ function renderGraphResult(result) {
     container.innerHTML = '';  // Clear previous
 
 
-
     const pre = document.createElement('pre');
     pre.style.backgroundColor = '#1e1e1e';
     pre.style.padding = '12px';
@@ -233,6 +234,40 @@ function renderGraphResult(result) {
 
     container.appendChild(pre);
 }
+
+function renderLLMResult(result) {
+    const container = document.getElementById('responseArea');
+    container.innerHTML = '';  // Clear previous
+
+    if (!result) {
+        container.textContent = "No response.";
+        return;
+    }
+
+    // Convert markdown to HTML using marked
+    const html = marked.parse(result);
+
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+    wrapper.style.backgroundColor = '#1e1e1e';
+    wrapper.style.padding = '12px';
+    wrapper.style.borderRadius = '6px';
+    wrapper.style.color = '#c0c0c0';
+    wrapper.style.fontFamily = 'sans-serif';
+    wrapper.style.lineHeight = '1.6';
+    wrapper.style.whiteSpace = 'pre-wrap';
+
+    // Optional: style code blocks
+    wrapper.querySelectorAll('code').forEach(codeBlock => {
+        codeBlock.style.backgroundColor = '#2a2a2a';
+        codeBlock.style.padding = '2px 4px';
+        codeBlock.style.borderRadius = '3px';
+        codeBlock.style.fontFamily = 'monospace';
+    });
+
+    container.appendChild(wrapper);
+}
+
 
 
 // Initialize the first doc and LLM model list
