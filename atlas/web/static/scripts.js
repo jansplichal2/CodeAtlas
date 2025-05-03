@@ -63,6 +63,7 @@ submitButton.addEventListener('click', async () => {
     }
 
     try {
+        showLoading();
         const response = await fetch('http://127.0.0.1:8000/api/v1/query', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -268,7 +269,18 @@ function renderLLMResult(result) {
     container.appendChild(wrapper);
 }
 
+function showLoading() {
+    const container = document.getElementById('responseArea');
+    container.innerHTML = '';
 
+    const loading = document.createElement('div');
+    loading.textContent = 'Loading...';
+    loading.style.color = '#888';
+    loading.style.padding = '1rem';
+    loading.style.fontStyle = 'italic';
+
+    container.appendChild(loading);
+}
 
 // Initialize the first doc and LLM model list
 updateDocs();
