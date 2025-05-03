@@ -75,3 +75,21 @@ textarea {
 #responseArea li {
     margin-bottom: 0.25rem;
 }
+
+#statusBar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1a1a1a;
+    color: #888;
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-top: 1px solid #333;
+    font-family: monospace;
+    z-index: 100;
+}
+
+#statusBar strong {
+    color: #ccc;
+}

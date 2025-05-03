@@ -12,6 +12,12 @@ const queryInput = document.getElementById('queryInput');
 const submitButton = document.getElementById('submitQuery');
 const responseArea = document.getElementById('responseArea');
 
+const statusBar = {
+    el: document.getElementById('statusBar'),
+    setStatus(text) {
+        this.el.textContent = text;
+    }
+};
 
 const llmModels = {
     openai: ['ChatGPT 4o', 'ChatGPT 4o-mini'],
@@ -63,7 +69,9 @@ submitButton.addEventListener('click', async () => {
     }
 
     try {
+        statusBar.setStatus(`Running query against ${payload.service}...`);
         showLoading();
+        const start = performance.now();
         const response = await fetch('http://127.0.0.1:8000/api/v1/query', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -71,7 +79,11 @@ submitButton.addEventListener('click', async () => {
         });
 
         if (!response.ok) {
-            responseArea.textContent = `Request failed: ${response.status}`
+            responseArea.textContent = `Request failed: ${response.status}`;
+            statusBar.setStatus("Request failed.");
+        } else {
+            const elapsed = Math.round(performance.now() - start);
+            statusBar.setStatus(`Query completed in ${elapsed} ms.`);
         }
         const data = await response.json();
 
