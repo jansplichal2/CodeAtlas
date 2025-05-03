@@ -96,8 +96,6 @@ submitButton.addEventListener('click', async () => {
 const renderRelationalResult = result => {
     responseArea.innerHTML = '';  // Clear previous
 
-
-
     if (!Array.isArray(result) || result.length === 0) {
         responseArea.textContent = "No results.";
         return;
