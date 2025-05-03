@@ -5,12 +5,12 @@ const llmModelSelect = document.getElementById('llmModelSelect');
 const documentation = document.getElementById('documentation');
 const responseArea = document.getElementById('responseArea');
 
-const docTexts = {
-    relational: `**Relational DB**\n\nSchema:\n- Tables: Users, Projects, Commits\n- Example Query: SELECT * FROM Users WHERE id = 1;`,
-    vector: `**Vector DB**\n\nEnter a semantic search query.\nExample: "Find code related to user authentication"`,
-    graph: `**Graph DB**\n\nUsing Joern queries.\nExample: cpg.call.code(".*password.*")`,
-    llm: `**LLM**\n\nEnter a prompt that will be processed by the selected LLM.`
-};
+// const docTexts = {
+//     relational: `**Relational DB**\n\nSchema:\n- Tables: Users, Projects, Commits\n- Example Query: SELECT * FROM Users WHERE id = 1;`,
+//     vector: `**Vector DB**\n\nEnter a semantic search query.\nExample: "Find code related to user authentication"`,
+//     graph: `**Graph DB**\n\nUsing Joern queries.\nExample: cpg.call.code(".*password.*")`,
+//     llm: `**LLM**\n\nEnter a prompt that will be processed by the selected LLM.`
+// };
 
 const llmModels = {
     openai: ['ChatGPT 4o', 'ChatGPT 4o-mini'],
@@ -19,7 +19,7 @@ const llmModels = {
 
 function updateDocs() {
     const selected = serviceSelect.value;
-    documentation.textContent = docTexts[selected] || '';
+    documentation.innerHTML = docTexts[selected] || '';
 }
 
 function toggleDocs() {
@@ -65,7 +65,13 @@ document.getElementById('submitQuery').addEventListener('click', async () => {
 
         if (!response.ok) throw new Error(`Error ${response.status}`);
         const data = await response.json();
-        responseArea.textContent = JSON.stringify(data, null, 2);
+
+        if (data.service === "relational") {
+            renderRelationalResult(data.result);
+        } else {
+            responseArea.textContent = JSON.stringify(data, null, 2);
+        }
+
     } catch (error) {
         responseArea.textContent = `Request failed: ${error.message}`;
     }
@@ -74,3 +80,55 @@ document.getElementById('submitQuery').addEventListener('click', async () => {
 // Initialize the first doc and LLM model list
 updateDocs();
 llmProviderSelect.dispatchEvent(new Event('change'));
+
+const renderRelationalResult = result => {
+    const container = document.getElementById('responseArea');
+    container.innerHTML = '';  // Clear previous
+
+    if (!Array.isArray(result) || result.length === 0) {
+        container.textContent = "No results.";
+        return;
+    }
+
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '1rem';
+
+    // Create header
+    const headerRow = document.createElement('tr');
+    ['File Path', 'Line No.', 'Parent Type', 'Parent Method', 'Source'].forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.borderBottom = '1px solid #444';
+        th.style.padding = '8px';
+        th.style.textAlign = 'left';
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    // Create rows
+    result.forEach(item => {
+        const row = document.createElement('tr');
+
+        const filePath = item.file_path || '-';
+        const lineNo = item.file_line_no !== null ? item.file_line_no : '-';
+        const parentType = item.parent_type || '-';
+        const parentMethod = item.parent_method || '-';
+        const source = item.source || '';
+
+        [filePath, lineNo, parentType, parentMethod, source].forEach(text => {
+            const td = document.createElement('td');
+            td.textContent = text;
+            td.style.padding = '6px 8px';
+            td.style.borderBottom = '1px solid #333';
+            td.style.fontFamily = text === source ? 'monospace' : 'inherit';
+            if (text === source) td.style.whiteSpace = 'pre'; // preserve spaces in source
+            row.appendChild(td);
+        });
+
+        table.appendChild(row);
+    });
+
+    container.appendChild(table);
+}
