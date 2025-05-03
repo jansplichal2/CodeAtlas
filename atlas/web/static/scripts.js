@@ -45,6 +45,7 @@ serviceSelect.addEventListener('change', () => {
     }
     updateDocs();
     clearResults();
+    statusBar.setStatus('Ready.');
 });
 
 llmProviderSelect.addEventListener('change', () => {
