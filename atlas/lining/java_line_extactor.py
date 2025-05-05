@@ -92,20 +92,32 @@ class JavaContextExtractor:
             if body and body.type in self._CONTAINERS:
                 children = body.children
 
-        # Detect Javadoc immediately preceding each child method
+        # Detect Javadoc immediately preceding method or class/interface/enum
         prev: Optional[Node] = None
         for child in children:
             if (
                     prev
                     and prev.type == "block_comment"
-                    and child.type == "method_declaration"
+                    and child.type in {"class_declaration", "interface_declaration", "enum_declaration",
+                                       "method_declaration"}
                     and self._is_javadoc(prev)
                     and prev.end_byte <= child.start_byte  # contiguous after whitespace
             ):
-                method_name_node = child.child_by_field_name("name")
-                if method_name_node:
-                    m_name = self._text(method_name_node)
-                    self._set_context(prev, new_fq_class, m_name)
+                name_node = child.child_by_field_name("name")
+                if name_node:
+                    simple = self._text(name_node)
+                    if child.type == "method_declaration":
+                        # Associate with method
+                        self._set_context(prev, new_fq_class, simple)
+                    else:
+                        # Associate with class/interface/enum
+                        fq_child_class = (
+                            f"{new_fq_class}.{simple}"
+                            if new_fq_class
+                            else f"{self.package_name}.{simple}" if self.package_name else simple
+                        )
+                        self._set_context(prev, fq_child_class, None)
+
             # Recurse – class context carries over; method resets for new child
             self._visit(child, new_fq_class, None)
             prev = child
