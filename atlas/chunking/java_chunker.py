@@ -116,5 +116,69 @@ class JavaChunker(BaseChunker):
                             file_path=str(relative_file_path)
                         ))
 
+        def clean_chunks(chunks: List[CodeChunk]) -> List[CodeChunk]:
+            cleaned_chunks = []
+
+            def classify_triviality(chunk: CodeChunk) -> str:
+                source = chunk.source.strip()
+                if not source:
+                    return "empty"
+
+                if source in {"}", "};", "{", "{;"}:
+                    return "brace"
+
+                lines = [line.strip() for line in source.splitlines() if line.strip()]
+                if all(line.startswith("//") or line.startswith("/*") for line in lines) and len(lines) <= 2:
+                    return "comment"
+
+                return "keep"
+
+            for chunk in chunks:
+                triviality = classify_triviality(chunk)
+
+                if triviality in {"empty", "comment"}:
+                    # Discard these chunks completely
+                    continue
+
+                if triviality == "brace":
+                    if cleaned_chunks:
+                        # Merge into previous chunk
+                        prev = cleaned_chunks[-1]
+                        merged_source = prev.source.rstrip() + "\n" + chunk.source
+                        cleaned_chunks[-1] = CodeChunk(
+                            chunk_type=prev.chunk_type,
+                            name=prev.name,
+                            chunk_no=prev.chunk_no,
+                            start_line=prev.start_line,
+                            end_line=chunk.end_line,
+                            source=merged_source,
+                            file_path=prev.file_path
+                        )
+                    continue
+
+                # Check tiny real code chunks (few meaningful lines)
+                meaningful_lines = [line for line in chunk.source.splitlines() if
+                                    line.strip() and not line.strip().startswith("//")]
+                if len(meaningful_lines) < 3 and cleaned_chunks:
+                    # Merge into previous chunk
+                    prev = cleaned_chunks[-1]
+                    merged_source = prev.source.rstrip() + "\n" + chunk.source
+                    cleaned_chunks[-1] = CodeChunk(
+                        chunk_type=prev.chunk_type,
+                        name=prev.name,
+                        chunk_no=prev.chunk_no,
+                        start_line=prev.start_line,
+                        end_line=chunk.end_line,
+                        source=merged_source,
+                        file_path=prev.file_path
+                    )
+                    continue
+
+                # Normal chunk → keep
+                cleaned_chunks.append(chunk)
+
+            return cleaned_chunks
+
         walk_tree(root_node.walk(), collect_node)
+        chunks = clean_chunks(chunks)
         return chunks
