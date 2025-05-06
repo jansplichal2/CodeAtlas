@@ -236,6 +236,55 @@ QDRANT_SCHEMA = """
 }
 """
 
+JOERN_SCHEMA = """
+Joern Code Property Graph (CPG) Query Format:
+
+You can run queries using cpg.* objects to extract code metadata.
+
+Entities:
+
+- cpg.method
+    - Methods in the codebase.
+    - Fields: name, fullName, code, lineNumber, signature, file.name
+
+- cpg.class
+    - Class declarations.
+    - Fields: name, fullName, code, lineNumber, file.name
+
+- cpg.call
+    - Function/method calls.
+    - Fields: name, code, methodFullName, lineNumber, file.name
+
+- cpg.file
+    - Source files.
+    - Fields: name (path)
+
+- cpg.local
+    - Local variables.
+    - Fields: name, code, lineNumber, methodFullName
+
+- cpg.typeDecl
+    - Type declarations (classes, interfaces, enums).
+    - Fields: name, fullName, inheritsFromTypeFullName
+
+Relationships and Methods:
+
+- Use .where(predicate) to filter
+- Use .code, .name, .lineNumber to access properties
+- Use .callIn, .callOut to navigate call graph
+- Use .ast to navigate syntax tree
+
+Output:
+
+Queries return lists of matching objects with available fields.
+
+Examples:
+
+- cpg.method.name
+- cpg.call.where(_.code.contains("eval")).code
+- cpg.file.name
+"""
+
 
 def run(query: str, sqlite_client, qdrant_client):
     orchestrator_agent = BaseAgent(
@@ -249,11 +298,11 @@ def run(query: str, sqlite_client, qdrant_client):
                 steps=[
                     "First reason and then choose an action.",
                     "If you can answer with confidence, choose final_answer and provide the final_answer.",
-                    "You are encouraged to use tool when in doubt, choose call_vector_db or call_relational_db and provide the necessary "
-                    "tool_parameters.",
+                    "You are encouraged to use tools when in doubt. You can use call_vector_db, call_relational_db or call_graph_db and provide the necessary tool_parameters."
                     "Use the provided context and potentially ask for specific tool calls to get missing information.",
-                    "When you use call_relational_db create a query valid for this schema " + SQLITE_SCHEMA,
-                    "When you use call_vector_db you use a semantic query - the output will be in this format " + QDRANT_SCHEMA
+                    "When you use call_relational_db create a query valid for this schema\n" + SQLITE_SCHEMA,
+                    "When you use call_vector_db you use a semantic query - the output will be in this format\n" + QDRANT_SCHEMA,
+                    "When you use call_graph_db (Joern), use CPG queries following this format:\n" + JOERN_SCHEMA
                 ],
             ),
             input_schema=ReasoningInputSchema,
