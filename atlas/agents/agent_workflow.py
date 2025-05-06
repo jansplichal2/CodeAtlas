@@ -11,6 +11,7 @@ from atomic_agents.lib.components.system_prompt_generator import SystemPromptGen
 from atlas.agents.orchestrator_agent import ReasoningInputSchema, AgentDecisionSchema
 from atlas.agents.relational_db_tool import RelationalDBToolOutputSchema, RelationalDBTool, RelationalDBToolInputSchema, \
     RelationalDBToolConfig
+from atlas.agents.graph_db_tool import GraphDBTool, GraphDBToolConfig, GraphDBToolInputSchema, GraphDBToolOutputSchema
 from atlas.agents.vector_db_tool import VectorDBTool, VectorDBToolInputSchema, VectorDBToolOutputSchema, \
     VectorDBToolConfig
 from atlas.config import QDRANT_COLLECTION, EMBED_MODEL
@@ -45,12 +46,17 @@ def format_tool_output_for_llm(output: Union[VectorDBToolOutputSchema, Relationa
             return f"Vector DB Tool Execution Failed: {output.error}"
         else:
             return "Vector DB Tool Output:\n" + "\n".join(str(res) for res in output.results)
+    elif isinstance(output, GraphDBToolOutputSchema):
+        if output.error:
+            return f"Graph DB Tool Execution Failed: {output.error}"
+        else:
+            return "Graph DB Tool Output:\n" + output.result
     else:
         return "Error: Unknown tool output type."
 
 
 def run_agent_workflow(user_query: str, main_agent: BaseAgent, vector_db_tool: VectorDBTool,
-                       relational_db_tool: RelationalDBTool):
+                       relational_db_tool: RelationalDBTool, graph_db_tool: GraphDBTool):
     """
     Orchestrates the multi-step agent workflow to answer a user query.
 
@@ -59,6 +65,7 @@ def run_agent_workflow(user_query: str, main_agent: BaseAgent, vector_db_tool: V
         main_agent: The configured reasoning agent instance (using ReasoningInputSchema/AgentDecisionSchema).
         vector_db_tool: Instantiated vector DB tool.
         relational_db_tool: Instantiated relational DB tool (ensure read-only connection if possible).
+        graph_db_tool: Instantiated graph DB tool.
 
     Returns:
         The final answer string or an error/fallback message.
@@ -153,7 +160,25 @@ def run_agent_workflow(user_query: str, main_agent: BaseAgent, vector_db_tool: V
                     logger.warning("Agent chose action 'call_relational_db' but provided no tool parameters.")
                     current_context = "Agent action was 'call_relational_db' but tool parameters were missing. Please reassess the situation based on previous context and the original query."
                     last_tool_output_formatted = current_context
-
+            elif agent_decision.action == 'call_graph_db':
+                if agent_decision.tool_parameters and isinstance(agent_decision.tool_parameters,
+                                                                 GraphDBToolInputSchema):
+                    logger.info("Agent requests tool call: graph_db")
+                    logger.debug(f"Tool parameters: {agent_decision.tool_parameters}")
+                    # --- Directly call the tool's run method ---
+                    tool_output_obj: GraphDBToolOutputSchema = graph_db_tool.run(agent_decision.tool_parameters)
+                    last_tool_output_formatted = format_tool_output_for_llm(tool_output_obj)
+                    current_context = last_tool_output_formatted
+                    logger.debug(f"Tool output (formatted, first 500 chars):\n{current_context[:500]}...")
+                elif agent_decision.tool_parameters:
+                    logger.warning(
+                        f"Agent requested 'call_graph_db' but parameters were wrong type: {type(agent_decision.tool_parameters)}")
+                    current_context = f"Agent provided incorrect parameter type for 'call_graph_db'. Expected GraphDBToolInputSchema, got {type(agent_decision.tool_parameters)}. Please reassess."
+                    last_tool_output_formatted = current_context
+                else:
+                    logger.warning("Agent chose action 'call_graph_db' but provided no tool parameters.")
+                    current_context = "Agent action was 'call_graph_db' but tool parameters were missing. Please reassess the situation based on previous context and the original query."
+                    last_tool_output_formatted = current_context
             else:
                 logger.error(f"Unknown or invalid agent action received: {agent_decision.action}")
                 final_response = f"Error: Agent returned an invalid action '{agent_decision.action}'."
@@ -246,9 +271,13 @@ def run(query: str, sqlite_client, qdrant_client):
         conn=sqlite_client
     )
 
+    graph_db_tool_cfg = GraphDBToolConfig()
+
     vector_db_tool = VectorDBTool(vector_tool_cfg)
     relational_db_tool = RelationalDBTool(db_tool_cfg)
+    graph_db_tool = GraphDBTool(graph_db_tool_cfg)
+
     logger.info("Tools configured, running the main workflow...")
-    final_result = run_agent_workflow(query, orchestrator_agent, vector_db_tool, relational_db_tool)
+    final_result = run_agent_workflow(query, orchestrator_agent, vector_db_tool, relational_db_tool, graph_db_tool)
     return final_result
 
