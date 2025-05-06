@@ -8,6 +8,7 @@ from atomic_agents.agents.base_agent import BaseAgent, BaseAgentConfig
 
 from atlas.agents.relational_db_tool import RelationalDBToolConfig, RelationalDBToolInputSchema
 from atlas.agents.vector_db_tool import VectorDBToolConfig, VectorDBToolInputSchema
+from atlas.agents.graph_db_tool import GraphDBToolConfig, GraphDBToolInputSchema  # ➡️ NEW import
 
 logger = logging.getLogger(__name__)
 
@@ -26,23 +27,23 @@ class AgentDecisionSchema(BaseIOSchema):
         ...,
         description="Your step-by-step reasoning based on the query and context to decide the next action."
     )
-    action: Literal['final_answer', 'call_vector_db', 'call_relational_db'] = Field(
+    action: Literal['final_answer', 'call_vector_db', 'call_relational_db', 'call_graph_db'] = Field(
         ...,
         description="The action to take next."
     )
-
-    tool_parameters: Optional[Union[RelationalDBToolInputSchema, VectorDBToolInputSchema]] = Field(
+    tool_parameters: Optional[Union[
+        RelationalDBToolInputSchema,
+        VectorDBToolInputSchema,
+        GraphDBToolInputSchema
+    ]] = Field(
         None,
-        description="Parameters if action is 'call_vector_db' or 'call_relational_db'"
+        description="Parameters if action is 'call_vector_db', 'call_relational_db' or 'call_graph_db'"
     )
     final_answer: Optional[str] = Field(None, description="The final answer if action is 'final_answer'")
 
 
 class OrchestratorAgentConfig(BaseAgentConfig):
     """Configuration for the Orchestrator Agent."""
-
     vector_db_config: VectorDBToolConfig
     relational_db_config: RelationalDBToolConfig
-
-
-
+    graph_db_config: GraphDBToolConfig
