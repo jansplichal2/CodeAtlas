@@ -252,14 +252,20 @@ Entities:
 
 Relationships and Methods:
 
-- .where(predicate), .code, .name, .lineNumber, .callIn, .callOut, .ast
+- .filter(predicate), .code, .name, .lineNumber, .callIn, .callOut, .ast
+
+Filtering:
+
+- When filtering by code or name, use .filter(_.code.matches(".*something.*")).
+- Do NOT use .contains or .regex → they are invalid in Joern queries.
 
 Examples:
 
 - cpg.method.name
-- cpg.call.where(_.code.contains("eval")).code
+- cpg.call.filter(_.code.matches(".*eval.*")).code
 - cpg.file.name
 """
+
 
 
 def run(query: str, sqlite_client, qdrant_client):
