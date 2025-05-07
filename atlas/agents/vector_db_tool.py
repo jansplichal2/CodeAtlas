@@ -52,6 +52,7 @@ class VectorDBTool(BaseTool):
 
     def run(self, params: VectorDBToolInputSchema) -> VectorDBToolOutputSchema:
         try:
+            logger.info(f"Execution of Vector query was requested: {params.query}")
             embedding = openai.embeddings.create(
                 input=params.query,
                 model=self.embedding_model

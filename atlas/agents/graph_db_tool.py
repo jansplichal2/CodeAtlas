@@ -39,6 +39,7 @@ class GraphDBTool(BaseTool):
 
     def run(self, params: GraphDBToolInputSchema) -> GraphDBToolOutputSchema:
         try:
+            logger.info(f"Execution of Joern query was requested: {params.query}")
             result = run_command(params.query)
             return GraphDBToolOutputSchema(result=result, error='')
         except Exception as e:

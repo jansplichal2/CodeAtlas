@@ -46,6 +46,7 @@ class RelationalDBTool(BaseTool):
 
     def run(self, params: RelationalDBToolInputSchema) -> RelationalDBToolOutputSchema:
         try:
+            logger.info(f"Execution of SQlite query was requested: {params.query}")
             cursor = self.conn.cursor()
             cursor.execute(params.query)
             columns = [desc[0] for desc in cursor.description]

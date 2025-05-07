@@ -61,7 +61,7 @@ def close_db_connection():
     if _connection:
         _connection.close()
         _connection = None
-        print("Database connection closed.")
+        logger.info("Database connection closed.")
 
 # Ensure the connection is closed when the program exits
 atexit.register(close_db_connection)
