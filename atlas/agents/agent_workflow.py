@@ -210,16 +210,14 @@ def run_agent_workflow(user_query: str, main_agent: BaseAgent, vector_db_tool: V
 
 
 SQLITE_SCHEMA = """
-CREATE TABLE IF NOT EXISTS chunks (
+CREATE TABLE IF NOT EXISTS lines (
     id INTEGER PRIMARY KEY,
-    chunk_id TEXT UNIQUE,
-    chunk_type TEXT, -- class, function, sql_statement, jsp or unknown
-    name TEXT, -- name of class or function
-    chunk_no INTEGER, -- if the class/function needs to be split into many parts, this is the part no
-    start_line INTEGER, -- start line in the source
-    end_line INTEGER, -- end line in the source
+    line_id TEXT UNIQUE,
+    parent_type TEXT, -- fully qualified type name - if the line belongs to class
+    parent_method TEXT, -- method name - if the line belongs to method
+    file_line_no INTEGER, -- file line number in the file
     file_path TEXT, -- file path relative to project directory
-    source TEXT, -- source code
+    source TEXT, -- source code of the line
     created_at TEXT
 );
 """
