@@ -34,12 +34,12 @@ function clearResults() {
 }
 
 function toggleDocs() {
-    documentation.style.display = documentation.style.display === 'none' ? 'block' : 'none';
+    documentation.style.display = documentation.style.display === 'none' || documentation.style.display === "" ? 'block' : 'none';
 }
 
 serviceSelect.addEventListener('change', () => {
     if (serviceSelect.value === 'llm') {
-        llmOptions.style.display = 'block';
+        llmOptions.style.display = 'flex';
     } else {
         llmOptions.style.display = 'none';
     }

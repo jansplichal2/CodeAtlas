@@ -8,42 +8,52 @@
 </head>
 <body>
 <h1>CodeAtlas Dev UI</h1>
+<div id="mainLayout">
+    <div id="formSection">
+        <div>
+            <label for="serviceSelect">Select Service:</label>
+            <div>
+                <select style="width: 100%" id="serviceSelect">
+                    <option value="relational">Relational DB</option>
+                    <option value="vector">Vector DB</option>
+                    <option value="graph">Graph DB</option>
+                    <option value="llm">LLM</option>
+                </select>
+            </div>
+        </div>
 
-<label for="serviceSelect">Select Service:</label>
-<div style="width: 490px">
-    <select style="width: 100%" id="serviceSelect">
-        <option value="relational">Relational DB</option>
-        <option value="vector">Vector DB</option>
-        <option value="graph">Graph DB</option>
-        <option value="llm">LLM</option>
-    </select>
-</div>
+        <div id="llmOptions" style="display: none;">
+            <div>
+                <label for="llmProviderSelect">LLM Provider:</label>
+                <select id="llmProviderSelect">
+                    <option value="openai">OpenAI</option>
+                    <option value="anthropic">Anthropic</option>
+                </select>
+            </div>
 
-<div id="llmOptions" style="display: none;">
-    <label for="llmProviderSelect">LLM Provider:</label>
-    <select id="llmProviderSelect">
-        <option value="openai">OpenAI</option>
-        <option value="anthropic">Anthropic</option>
-    </select>
+            <div>
+                <label for="llmModelSelect">LLM Model:</label>
+                <select id="llmModelSelect">
+                    <!-- dynamically populated based on LLM provider -->
+                </select>
+            </div>
+        </div>
 
-    <label for="llmModelSelect">LLM Model:</label>
-    <select id="llmModelSelect">
-        <!-- dynamically populated based on LLM provider -->
-    </select>
-</div>
+        <div>
+            <label for="queryInput">Enter Query:</label>
+            <textarea id="queryInput" placeholder="Type your query here..."></textarea>
+        </div>
+        <button id="submitQuery">Submit Query</button>
 
-<label for="queryInput">Enter Query:</label>
-<textarea id="queryInput" placeholder="Type your query here..."></textarea>
+        <button class="doc-toggle" onclick="toggleDocs()">Show/Hide Documentation</button>
+    </div>
 
-<button id="submitQuery">Submit Query</button>
+    <div id="documentation"></div>
 
-<button class="doc-toggle" onclick="toggleDocs()">Show/Hide Documentation</button>
-<div id="documentation" style="display: none"></div>
-
-<div id="responseArea" class="response"></div>
-<div id="statusBar">Ready.</div>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="/static/docs.js"></script>
-<script src="/static/scripts.js"></script>
+    <div id="responseArea" class="response"></div>
+    <div id="statusBar">Ready.</div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/static/docs.js"></script>
+    <script src="/static/scripts.js"></script>
 </body>
 </html>

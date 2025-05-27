@@ -6,6 +6,10 @@ body {
     padding: 2rem;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 button, select, textarea {
     background-color: #1e1e1e;
     color: #e0e0e0;
@@ -92,4 +96,60 @@ textarea {
 
 #statusBar strong {
     color: #ccc;
+}
+
+
+#formSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1.0rem;
+}
+
+#formSection label {
+    display: block;
+    margin-bottom: 0.4rem; /* adjust this value as needed */
+}
+
+#llmOptions {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+}
+
+#llmOptions label {
+    display: inline-block;
+}
+
+#mainLayout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    #mainLayout {
+        display: grid;
+        grid-template-columns: 3fr 4fr;
+        grid-template-areas:
+            "form docs"
+            "response response";
+        gap: 2rem;
+    }
+
+    #formSection {
+        grid-area: form;
+    }
+
+    #documentation {
+        grid-area: docs;
+        display: block;
+    }
+
+    #responseArea {
+        grid-area: response;
+    }
+
+    .doc-toggle {
+        display: none;
+    }
 }

@@ -34,18 +34,7 @@ ORDER BY file_line_no;
 
 <pre><code>SELECT * FROM lines
 WHERE source LIKE '%password%';
-</code></pre>
-
-<pre><code>SELECT * FROM lines
-ORDER BY created_at DESC
-LIMIT 10;
-</code></pre>
-
-<pre><code>SELECT * FROM lines
-WHERE parent_method IS NULL
-ORDER BY file_path, file_line_no;
-</code></pre>
-`,
+</code></pre>`,
 
   vector: `
 <h3>Vector DB</h3>
