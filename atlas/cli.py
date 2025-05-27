@@ -16,7 +16,6 @@ from atlas.config import EMBED_PROVIDER, EMBED_MODEL, QDRANT_PATH
 from atlas.embedding.embedder import embed_chunks
 from atlas.embedding.embedding_dispatcher import get_embedder
 from atlas.sqlite.lines_loader import load_lines_to_sqlite
-from atlas.sqlite.chunks_loader import load_chunks_to_sqlite
 from atlas.sqlite.utils import get_db_connection, execute_sql_query
 from atlas.qdrant.chunks_loader import load_chunks_to_qdrant, execute_qdrant_query
 from atlas.utils import iter_files
@@ -26,9 +25,14 @@ logging.basicConfig(
 )
 
 app = typer.Typer()
+
+# test subcommand
 test_app = typer.Typer()
 app.add_typer(test_app, name="test")
 
+# load subcommand
+load_app = typer.Typer()
+app.add_typer(load_app, name="load")
 
 def validate_and_normalize(root: Path, project_root: str):
     base_path = Path(root).resolve()
@@ -140,13 +144,7 @@ def errors():
     display_error_chunks()
 
 
-@app.command("load-sqlite")
-def load_sqlite():
-    typer.echo("📥 Loading chunk metadata into SQLite...")
-    load_chunks_to_sqlite()
-
-
-@app.command("load-sqlite-lines")
+@load_app.command("sqlite")
 def load_sqlite_lines():
     typer.echo("📥 Loading line metadata into SQLite...")
     load_lines_to_sqlite()
@@ -158,7 +156,7 @@ def embed():
     embed_chunks()
 
 
-@app.command("load-qdrant")
+@load_app.command("qdrant")
 def load_qdrant():
     typer.echo(f"🚀 Loading chunks into qdrant...")
     load_chunks_to_qdrant()
