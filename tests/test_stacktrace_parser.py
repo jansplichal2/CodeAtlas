@@ -1,5 +1,5 @@
 import unittest
-from atlas.stacktrace.parser import parse_stacktrace  # adjust import as needed
+from atlas.stacktrace.parser import parse_stacktrace
 
 class TestStacktraceParser(unittest.TestCase):
     def test_simple_trace(self):

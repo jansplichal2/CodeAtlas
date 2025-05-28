@@ -21,3 +21,14 @@ def parse_stacktrace(trace_text):
         })
 
     return parsed_frames
+
+def find_root_cause_frame(frames):
+    """
+    Return the most likely root-cause frame based on:
+    1. First frame marked as user code.
+    2. Otherwise, fall back to the first frame.
+    """
+    for frame in frames:
+        if frame["is_user_code"]:
+            return frame
+    return frames[0] if frames else None
