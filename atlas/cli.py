@@ -9,10 +9,14 @@ from atlas.lining.line_extractor import save_lines_to_file
 from atlas.lining.line_extractor_dispatcher import get_line_extractor
 from atlas.qdrant.chunks_loader import client as qdrant_client
 
+from atlas.stacktrace.dbaccess import get_method_context
+from atlas.stacktrace.parser import parse_stacktrace, find_root_cause_frame
+from atlas.stacktrace.prompt import build_explainer_prompt
+
 from atlas.agents.agent_workflow import run
 from atlas.chunking.chunk_dispatcher import get_chunker
 from atlas.chunking.chunker import save_chunks_to_files, validate_chunks, cleanup_chunks, display_error_chunks
-from atlas.config import EMBED_PROVIDER, EMBED_MODEL, QDRANT_PATH
+from atlas.config import EMBED_PROVIDER, EMBED_MODEL, QDRANT_PATH, CONTEXT_LINES
 from atlas.embedding.embedder import embed_chunks
 from atlas.embedding.embedding_dispatcher import get_embedder
 from atlas.sqlite.lines_loader import load_lines_to_sqlite
@@ -88,6 +92,45 @@ def extract_lines(
 
 
     typer.echo(f"💾 Saved {counter} files to .lines/")
+
+@app.command()
+def explain_trace(
+    trace_file: Path = typer.Argument(..., help="Path to stacktrace file"),
+    context_lines: int = typer.Option(CONTEXT_LINES, "--context-lines", help="Lines of context to show around root cause"),
+    dry_run: bool = typer.Option(True, "--dry-run", help="Print prompt instead of calling LLM"),
+):
+    stacktrace = trace_file.read_text()
+    frames = parse_stacktrace(stacktrace)
+    if not frames:
+        typer.echo(f"❌No valid stacktrace frames found.")
+        raise typer.Exit(code=1)
+
+    root_frame = find_root_cause_frame(frames)
+    if not root_frame:
+        typer.echo("❌No root frame could be determined.")
+        raise typer.Exit(code=1)
+
+    with get_db_connection() as sqlite:
+        context = get_method_context(
+            db_conn=sqlite,
+            parent_type=root_frame["class"],
+            parent_method=root_frame["method"],
+            line_no=root_frame["line"],
+            context_lines=context_lines
+        )
+
+    if not context:
+        typer.echo(f"[yellow]Code context for method {root_frame['method']} not found in DB.[/yellow]")
+        raise typer.Exit(code=2)
+
+    prompt = build_explainer_prompt(stacktrace, root_frame, context)
+
+    if dry_run:
+        typer.echo("--- Prompt Preview ---\n")
+        typer.echo(prompt)
+    else:
+        # Placeholder for future LLM API call
+        typer.echo("LLM integration not implemented yet")
 
 @app.command()
 def chunk(

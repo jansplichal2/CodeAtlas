@@ -10,6 +10,7 @@ LINES_DIR = PROJECT_ROOT / ".lines"
 DB_PATH = PROJECT_ROOT / ".codeatlas.sqlite"
 MAX_TOKENS = 8192
 MAX_CHUNK_LINES = 80
+CONTEXT_LINES = 10
 
 EMBED_PROVIDER = "openai"
 EMBED_MODEL = "text-embedding-3-small"
