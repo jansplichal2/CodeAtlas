@@ -8,22 +8,6 @@ _connection = None
 
 logger = logging.getLogger(__name__)
 
-CHUNK_SCHEMA = """
-CREATE TABLE IF NOT EXISTS chunks (
-    id INTEGER PRIMARY KEY,
-    chunk_id TEXT UNIQUE,
-    chunk_type TEXT,
-    name TEXT,
-    chunk_no INTEGER,
-    start_line INTEGER,
-    end_line INTEGER,
-    file_path TEXT,
-    source TEXT,
-    tokens INTEGER,
-    created_at TEXT
-);
-"""
-
 LINE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS lines (
     id INTEGER PRIMARY KEY,
@@ -47,7 +31,6 @@ def get_db_connection():
             _connection.row_factory = sqlite3.Row # Optional: Access columns by name
             _connection.execute("PRAGMA journal_mode=WAL;")
             logger.info("Database connection opened.")
-            _connection.executescript(CHUNK_SCHEMA)
             _connection.executescript(LINE_SCHEMA)
             logger.info("Schemas loaded")
         except sqlite3.Error as e:
