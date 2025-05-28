@@ -38,7 +38,7 @@ public class BigClass {{
         """
         Tests if a long Java method is correctly split into multiple chunks.
         """
-        chunker = JavaChunker()
+        chunker = JavaChunker('/')
         chunks = chunker.extract_chunks_from_file(self.tmp_path)
 
         print(f"Extracted {len(chunks)} chunks:")  # Optional: keep for debugging/info

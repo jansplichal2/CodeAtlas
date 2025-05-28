@@ -45,7 +45,7 @@ SELECT * FROM users;
         """
         Tests if multiple SQL statements in a file are chunked correctly.
         """
-        chunker = SQLChunker()
+        chunker = SQLChunker("/")
         chunks = chunker.extract_chunks_from_file(self.tmp_path)
 
         print(f"Extracted {len(chunks)} SQL chunks:")  # Optional: for debugging/info

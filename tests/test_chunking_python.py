@@ -49,7 +49,7 @@ def big_function():
         """
         Tests if a long Python function is correctly split into multiple chunks.
         """
-        chunker = PythonChunker()
+        chunker = PythonChunker("/")
         chunks = chunker.extract_chunks_from_file(self.tmp_path)
 
         print(f"Extracted {len(chunks)} chunks:")  # Optional: for debugging/info
